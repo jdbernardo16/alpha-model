@@ -56,19 +56,21 @@ const slidePrev = () => {
                     >
                         <swiper-slide v-for="(item, index) in items" :key="index">
                             <div
-                                class="h-[377px] bg-black rounded-lg overflow-hidden relative model-card"
+                                class="aspect-w-[250] aspect-h-[350] bg-black rounded-lg overflow-hidden relative model-card"
                             >
-                                <img
-                                    class="w-full h-full object-cover grayscale"
-                                    :src="item.image"
-                                    alt="model1"
-                                />
-                                <div
-                                    class="absolute bottom-0 left-0 w-full h-full bg-gradient-to-b from-primary-orange/[0.7] to-primary-pink/[0.7] flex flex-col justify-end text-white overlay-gradient transition"
-                                >
-                                    <div class="model-card-content">
-                                        <p class="text-lg font-medium mb-1">{{ item.name }}</p>
-                                        <p>{{ item.location }}</p>
+                                <div class="w-full h-full">
+                                    <img
+                                        class="w-full h-full object-cover grayscale"
+                                        :src="item.image"
+                                        alt="model1"
+                                    />
+                                    <div
+                                        class="absolute bottom-0 left-0 w-full h-full bg-gradient-to-b from-primary-orange/[0.7] to-primary-pink/[0.7] flex flex-col justify-end text-white overlay-gradient transition"
+                                    >
+                                        <div class="model-card-content">
+                                            <p class="text-lg font-medium mb-1">{{ item.name }}</p>
+                                            <p>{{ item.location }}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -94,7 +96,7 @@ const slidePrev = () => {
     </section>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .model-card {
     .overlay-gradient {
         height: 100%;

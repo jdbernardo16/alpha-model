@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ArrowRightIcon } from '@heroicons/vue/24/solid';
 import FeaturedModelSlider from '@/components/slider/FeaturedModelSlider.vue';
+import ProjectSlider from '@/components/slider/ProjectSlider.vue';
+import PartnerSlider from '@/components/slider/PartnerSlider.vue';
 
 const items = [
     {
@@ -25,14 +27,14 @@ const items = [
         location: 'Los Angeles, CA',
     },
     {
-        id: 3,
+        id: 4,
         title: 'Model 4',
         image: '/images/item4.png',
         name: 'Tyler Charly',
         location: 'Los Angeles, CA',
     },
     {
-        id: 3,
+        id: 5,
         title: 'Model 5',
         image: '/images/item5.jpg',
         name: 'Tyler Charly',
@@ -55,6 +57,24 @@ const values = [
         icon: '/images/talents.svg',
         title: 'Professional Standards',
         description: 'Guaranteed Quality & Expertise',
+    },
+];
+
+const gallery = [
+    {
+        id: 1,
+        image: '/images/item5.jpg',
+        name: 'Joshua Treeshot',
+    },
+    {
+        id: 2,
+        image: '/images/item4.png',
+        name: 'Joshua Treeshot',
+    },
+    {
+        id: 3,
+        image: '/images/item3.jpg',
+        name: 'Joshua Treeshot',
     },
 ];
 </script>
@@ -95,21 +115,25 @@ const values = [
             </div>
             <!-- Right Side -->
             <div class="w-1/2">
-                <div
-                    class="w-[482px] h-[736px] bg-primary-pink overflow-hidden rounded-b-full relative m-auto"
-                >
-                    <img
-                        class="w-full absolute bottom-0 left-0"
-                        src="/images/heroimage.png"
-                        alt="image"
-                    />
+                <div class="w-[70%] m-auto">
+                    <div
+                        class="aspect-w-[482] aspect-h-[736] bg-primary-pink overflow-hidden rounded-b-full relative m-auto"
+                    >
+                        <div class="w-full h-full">
+                            <img
+                                class="w-full absolute bottom-0 left-0 object-contain"
+                                src="/images/heroimage.png"
+                                alt="image"
+                            />
 
-                    <!-- Arrow -->
-                    <img
-                        src="/images/hero-arrow.svg"
-                        alt="hero-arrow"
-                        class="absolute top-14 right-4"
-                    />
+                            <!-- Arrow -->
+                            <img
+                                src="/images/hero-arrow.svg"
+                                alt="hero-arrow"
+                                class="absolute top-14 right-4 w-[15%]"
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -145,34 +169,64 @@ const values = [
                 </p>
             </div>
             <div class="grid grid-cols-3 gap-10">
-                <div>
-                    <div class="aspect-w-[431] aspect-h-[485] rounded-lg overflow-hidden">
-                        <img
-                            class="w-full h-full object-cover"
-                            src="/images/item5.jpg"
-                            alt="image"
-                        />
-                    </div>
-                </div>
-                <div>
-                    <div class="aspect-w-[431] aspect-h-[485] rounded-lg overflow-hidden">
-                        <img
-                            class="w-full h-full object-cover"
-                            src="/images/item4.png"
-                            alt="image"
-                        />
-                    </div>
-                </div>
-                <div>
-                    <div class="aspect-w-[431] aspect-h-[485] rounded-lg overflow-hidden">
-                        <img
-                            class="w-full h-full object-cover"
-                            src="/images/item3.jpg"
-                            alt="image"
-                        />
+                <div v-for="(item, index) in gallery" :key="index">
+                    <div
+                        class="aspect-w-[431] aspect-h-[485] rounded-lg overflow-hidden group/gallery"
+                    >
+                        <img class="w-full h-full object-cover" :src="item.image" alt="image" />
+                        <div
+                            class="w-full h-full absolute top-0 left-0 bg-black bg-opacity-50 flex items-center justify-end flex-col text-white space-y-4 p-6 opacity-0 group-hover/gallery:opacity-100 transition"
+                        >
+                            <p>{{ item.name }}</p>
+                            <Button
+                                class="uppercase font-bold bg-primary-pink p-5 flex items-center space-x-5 hover:bg-opacity-80 transition rounded-lg"
+                            >
+                                <p>View Gallery</p>
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <section>
+        <div class="max-w-[1440px] m-auto px-10 py-16">
+            <div class="flex items-center justify-between space-x-10">
+                <div class="w-1/2">
+                    <div class="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden">
+                        <img class="w-full object-cover" src="/images/blog1.png" alt="blog" />
+                    </div>
+                </div>
+                <div class="w-1/2">
+                    <div class="mb-6">
+                        <p class="text-xl font-bold mb-3">Blogs</p>
+                        <h3 class="text-3xl font-serif mb-3 line-clamp-2">
+                            Empowerment for Models:5 Ways to Prioritize Self Care for prolonged your
+                            career as a model
+                        </h3>
+                        <p class="text-xs text-neutral-500">Nov 6, 2024</p>
+                    </div>
+                    <div class="mb-6">
+                        <p class="line-clamp-4">
+                            Being a model is more than just looking good and striking a pose—it is a
+                            demanding career that requires hard work, dedication, and perseverance.
+                            In an industry that often focuses on external appearance, it is
+                            essential for models to prioritize their mental and physical health.
+                            This article will provide you with five ways to prioritize self-care for
+                            prolonged your career as a model.
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-3 text-primary-pink cursor-pointer">
+                        <p>Learn more</p>
+                        <ArrowRightIcon class="w-6 h-6" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <ProjectSlider :items="items" />
+
+    <PartnerSlider />
 </template>
