@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '../views/HomePage.vue';
+import ModelIndex from '../views/models/IndexPage.vue';
+import ModelView from '../views/models/ViewPage.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,6 +10,18 @@ const router = createRouter({
             path: '/',
             name: 'home',
             component: HomePage,
+        },
+        // Models
+        {
+            path: '/models',
+            name: 'models',
+            component: ModelIndex,
+        },
+        {
+            path: '/models/:id',
+            name: 'model-view',
+            component: ModelView,
+            props: true,
         },
         {
             path: '/about',

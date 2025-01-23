@@ -1,5 +1,15 @@
 @import './fonts/merriweather/stylesheet.css';
 @import './fonts/montserrat/stylesheet.css';
+@import './fonts/figtree/stylesheet.css';
+@import './fonts/charmonman/stylesheet.css';
+
+.font-figtree {
+    font-family: 'Figtree', sans-serif;
+}
+
+.font-charmonman {
+    font-family: 'Charmonman', sans-serif;
+}
 
 @tailwind base;
 @tailwind components;
