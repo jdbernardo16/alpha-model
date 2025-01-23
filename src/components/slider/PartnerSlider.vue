@@ -1,3 +1,28 @@
+<script setup lang="ts">
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Autoplay, FreeMode } from 'swiper/modules';
+import 'swiper/css/free-mode';
+import 'swiper/css';
+
+defineProps({
+    data: {
+        type: Object,
+        default: null,
+    },
+});
+
+const modules = [Autoplay, FreeMode];
+
+// Partner logos (replace with your actual image paths)
+const partners = [
+    '/images/partner1.png',
+    '/images/partner2.png',
+    '/images/partner3.png',
+    '/images/partner4.png',
+    '/images/partner5.png',
+];
+</script>
+
 <template>
     <section>
         <div class="partner-swiper max-w-[1440px] m-auto pb-16">
@@ -30,30 +55,5 @@
         </div>
     </section>
 </template>
-
-<script setup>
-import { Swiper, SwiperSlide } from 'swiper/vue';
-import { Autoplay, FreeMode } from 'swiper/modules';
-import 'swiper/css/free-mode';
-import 'swiper/css';
-
-defineProps({
-    data: {
-        type: Object,
-        default: null,
-    },
-});
-
-const modules = [Autoplay, FreeMode];
-
-// Partner logos (replace with your actual image paths)
-const partners = [
-    '/images/partner1.png',
-    '/images/partner2.png',
-    '/images/partner3.png',
-    '/images/partner4.png',
-    '/images/partner5.png',
-];
-</script>
 
 <style scoped lang="scss"></style>

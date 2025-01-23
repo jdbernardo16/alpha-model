@@ -37,7 +37,7 @@ const slidePrev = () => {
 
 <template>
     <section class="bg-white h-[350px] relative">
-        <div class="max-w-[1440px] m-auto px-10 absolute bottom-10 w-full">
+        <div class="max-w-[1440px] left-1/2 -translate-x-1/2 px-10 absolute bottom-10 w-full">
             <p class="font-bold text-xl mb-6 text-white">Featured Models</p>
 
             <div class="flex items-center">

@@ -2,7 +2,7 @@
 import { ArrowRightIcon } from '@heroicons/vue/24/solid';
 import FeaturedModelSlider from '@/components/slider/FeaturedModelSlider.vue';
 import ProjectSlider from '@/components/slider/ProjectSlider.vue';
-import PartnerSlider from '@/components/slider/PartnerSlider.vue';
+import PartnerSlider from '../components/slider/PartnerSlider.vue';
 
 const items = [
     {
