@@ -8,6 +8,7 @@ import compression from 'vite-plugin-compression';
 
 // https://vite.dev/config/
 export default defineConfig({
+    base: '/',
     plugins: [
         vue(),
         vueDevTools(),
@@ -31,5 +32,12 @@ export default defineConfig({
     },
     server: {
         port: 3000,
+        proxy: {
+            '/api': {
+                target: 'http://localhost:3000',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api/, ''),
+            },
+        },
     },
 });
