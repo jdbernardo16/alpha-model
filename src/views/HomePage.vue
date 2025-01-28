@@ -1,8 +1,56 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import type { HomePageData } from '../types';
 import { ArrowRightIcon } from '@heroicons/vue/24/solid';
 import FeaturedModelSlider from '@/components/slider/FeaturedModelSlider.vue';
 import ProjectSlider from '@/components/slider/ProjectSlider.vue';
 import PartnerSlider from '../components/slider/PartnerSlider.vue';
+
+const GET_HOME = `
+    query getHome {
+        page(id: "home", idType: URI) {
+            id
+            title
+            slug
+            ... on WithAcfHomepage {
+                homepage {
+                    frame1 {
+                        header
+                        description
+                        buttonText
+                        buttonLink
+                        image {
+                            node {
+                                id
+                                sourceUrl
+                                srcSet
+                                altText
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+`;
+
+const result = ref<HomePageData | null>(null);
+const loading = ref(true);
+const error = ref<Error | null>(null);
+
+onMounted(async () => {
+    try {
+        const response = await axios.post('http://localhost:8000/graphql', {
+            query: GET_HOME,
+        });
+        result.value = response.data.data as HomePageData;
+    } catch (err) {
+        error.value = err as Error;
+    } finally {
+        loading.value = false;
+    }
+});
 
 const items = [
     {
@@ -92,20 +140,21 @@ const gallery = [
                 <div class="w-[647px] pt-20">
                     <div class="mb-10">
                         <h1 class="text-h1 font-serif leading-tight mb-6">
-                            Where Talent Meets Style
+                            {{ result?.page?.homepage?.frame1?.header }}
                         </h1>
                         <p class="text-lg max-w-[490px]">
-                            Explore our curated selection of models and hire the perfect fit for
-                            your project.
+                            {{ result?.page?.homepage?.frame1?.description }}
                         </p>
                     </div>
                     <div class="flex items-center space-x-10">
-                        <Button
-                            class="uppercase font-bold bg-primary-pink p-5 flex items-center space-x-5 hover:bg-opacity-80 transition rounded-lg"
-                        >
-                            <p>Hire Models Now</p>
-                            <ArrowRightIcon class="w-6 h-6" />
-                        </Button>
+                        <a :href="result?.page?.homepage?.frame1?.buttonLink">
+                            <Button
+                                class="uppercase font-bold bg-primary-pink p-5 flex items-center space-x-5 hover:bg-opacity-80 transition rounded-lg"
+                            >
+                                <p>{{ result?.page?.homepage?.frame1?.buttonText }}</p>
+                                <ArrowRightIcon class="w-6 h-6" />
+                            </Button>
+                        </a>
                         <Button class="flex items-center space-x-4">
                             <img src="/images/play.svg" alt="play" />
                             <p>Play Video</p>
@@ -138,6 +187,7 @@ const gallery = [
             </div>
         </div>
     </section>
+
     <!-- Featured Models -->
     <FeaturedModelSlider :items="items" />
 

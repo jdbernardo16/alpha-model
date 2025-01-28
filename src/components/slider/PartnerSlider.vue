@@ -5,7 +5,7 @@ import 'swiper/css/free-mode';
 import 'swiper/css';
 
 defineProps({
-    data: {
+    items: {
         type: Object,
         default: null,
     },
@@ -46,9 +46,13 @@ const partners = [
                     },
                 }"
             >
-                <swiper-slide v-for="(partner, index) in partners" :key="index">
+                <swiper-slide v-for="(partner, index) in items" :key="index">
                     <div>
-                        <img :src="partner" alt="Partner Logo" class="partner-logo m-auto" />
+                        <img
+                            :src="partner.image.node.sourceUrl"
+                            :alt="partner.name"
+                            class="partner-logo m-auto"
+                        />
                     </div>
                 </swiper-slide>
             </swiper>

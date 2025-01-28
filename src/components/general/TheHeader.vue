@@ -20,11 +20,11 @@ const route = useRoute();
                         Home
                     </router-link>
                     <router-link
-                        to="/models"
-                        :class="{ 'text-primary-pink': route.path.startsWith('/models') }"
+                        to="/talents"
+                        :class="{ 'text-primary-pink': route.path.startsWith('/talents') }"
                         class="hover:text-primary-pink transition-colors"
                     >
-                        Models
+                        Talents
                     </router-link>
                     <router-link
                         to="/about"

@@ -7,7 +7,7 @@ import 'swiper/css/navigation';
 import 'swiper/css';
 
 defineProps({
-    data: {
+    items: {
         type: Object,
         default: null,
     },
@@ -70,9 +70,9 @@ const images = [
             }"
             @swiper="onSwiper"
         >
-            <swiper-slide v-for="(image, index) in images" :key="index">
+            <swiper-slide v-for="(image, index) in items" :key="index">
                 <div class="aspect-w-[255] aspect-h-[370] overflow-hidden">
-                    <img class="w-full h-full object-cover" :src="image" alt="image" />
+                    <img class="w-full h-full object-cover" :src="image.sourceUrl" alt="image" />
                 </div>
             </swiper-slide>
         </swiper>

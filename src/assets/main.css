@@ -11,6 +11,14 @@
     font-family: 'Charmonman', sans-serif;
 }
 
+pre {
+    background-color: #000;
+    color: #f1f1f1;
+    font-size: 0.75rem !important;
+    line-height: 1.5rem;
+    padding: 2rem;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

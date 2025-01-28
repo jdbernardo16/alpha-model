@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '../views/HomePage.vue';
-import ModelIndex from '../views/models/IndexPage.vue';
-import ModelView from '../views/models/ViewPage.vue';
+import TalentIndex from '../views/talents/IndexPage.vue';
+import TalentView from '../views/talents/ViewPage.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,14 +13,14 @@ const router = createRouter({
         },
         // Models
         {
-            path: '/models',
-            name: 'models',
-            component: ModelIndex,
+            path: '/talents',
+            name: 'talents',
+            component: TalentIndex,
         },
         {
-            path: '/models/:id',
-            name: 'model-view',
-            component: ModelView,
+            path: '/talents/:slug',
+            name: 'talent-view',
+            component: TalentView,
             props: true,
         },
         {
