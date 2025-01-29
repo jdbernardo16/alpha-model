@@ -83,7 +83,7 @@ const loading = ref(true);
 const error = ref<Error | null>(null);
 onMounted(async () => {
     try {
-        const response = await axios.post('http://localhost:8000/graphql', {
+        const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
             query: GET_TALENTS,
         });
         talents.value = response.data.data.talents.nodes;

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import type { HomePageData } from '../types';
+import type { HomePageData, FeaturedTalentData } from '../types';
 import { ArrowRightIcon } from '@heroicons/vue/24/solid';
 import FeaturedModelSlider from '@/components/slider/FeaturedModelSlider.vue';
 import ProjectSlider from '@/components/slider/ProjectSlider.vue';
@@ -29,102 +29,114 @@ const GET_HOME = `
                             }
                         }
                     }
+                    frame2 {
+                        title
+                    }
+                    frame3 {
+                        values {
+                            icon {
+                                node {
+                                    sourceUrl
+                                }
+                            }
+                            title
+                            shortDescription
+                        }
+                    }
+                    frame4 {
+                        header
+                        description
+                        events {
+                            title
+                            link
+                            image {
+                                node {
+                                    sourceUrl
+                                }
+                            }
+                        }
+                    }
+                    frame6 {
+                        header
+                        description
+                        projects {
+                            image {
+                                node {
+                                    sourceUrl
+                                }
+                            }
+                            title
+                        }
+                    }
+                    frame7 {
+                        partners {
+                            name
+                            image {
+                                node {
+                                    sourceUrl
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 `;
 
-const result = ref<HomePageData | null>(null);
+const GET_FEATURED_TALENTS = `
+  query GetFeaturedTalents {
+    featuredTalents {
+      nodes {
+        id
+        title
+        isFeatured
+        slug
+        talentContent {
+          thumbnail {
+            node {
+              sourceUrl
+            }
+          }
+        frame1 {
+            location
+            tags
+        }
+
+        }
+      }
+    }
+  }
+`;
+
+const cms = ref<HomePageData | null>(null);
+const featuredTalent = ref<FeaturedTalentData | null>(null);
 const loading = ref(true);
 const error = ref<Error | null>(null);
 
 onMounted(async () => {
     try {
-        const response = await axios.post('http://localhost:8000/graphql', {
+        const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
             query: GET_HOME,
         });
-        result.value = response.data.data as HomePageData;
+        cms.value = response.data.data.page.homepage as HomePageData;
+    } catch (err) {
+        error.value = err as Error;
+    } finally {
+        loading.value = false;
+    }
+
+    try {
+        const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
+            query: GET_FEATURED_TALENTS,
+        });
+        featuredTalent.value = response.data.data.featuredTalents.nodes as FeaturedTalentData;
     } catch (err) {
         error.value = err as Error;
     } finally {
         loading.value = false;
     }
 });
-
-const items = [
-    {
-        id: 1,
-        title: 'Model 1',
-        image: '/images/item1.jpg',
-        name: 'Tyler Charly',
-        location: 'Los Angeles, CA',
-    },
-    {
-        id: 2,
-        title: 'Model 2',
-        image: '/images/item2.jpg',
-        name: 'Tyler Charly',
-        location: 'Los Angeles, CA',
-    },
-    {
-        id: 3,
-        title: 'Model 3',
-        image: '/images/item3.jpg',
-        name: 'Tyler Charly',
-        location: 'Los Angeles, CA',
-    },
-    {
-        id: 4,
-        title: 'Model 4',
-        image: '/images/item4.png',
-        name: 'Tyler Charly',
-        location: 'Los Angeles, CA',
-    },
-    {
-        id: 5,
-        title: 'Model 5',
-        image: '/images/item5.jpg',
-        name: 'Tyler Charly',
-        location: 'Los Angeles, CA',
-    },
-];
-
-const values = [
-    {
-        icon: '/images/talents.svg',
-        title: 'Top Talent',
-        description: 'Exclusive Access to Leading Models',
-    },
-    {
-        icon: '/images/booking.svg',
-        title: 'Flexible Booking',
-        description: 'Tailored to Your Schedule',
-    },
-    {
-        icon: '/images/talents.svg',
-        title: 'Professional Standards',
-        description: 'Guaranteed Quality & Expertise',
-    },
-];
-
-const gallery = [
-    {
-        id: 1,
-        image: '/images/item5.jpg',
-        name: 'Joshua Treeshot',
-    },
-    {
-        id: 2,
-        image: '/images/item4.png',
-        name: 'Joshua Treeshot',
-    },
-    {
-        id: 3,
-        image: '/images/item3.jpg',
-        name: 'Joshua Treeshot',
-    },
-];
 </script>
 
 <template>
@@ -140,18 +152,18 @@ const gallery = [
                 <div class="w-[647px] pt-20">
                     <div class="mb-10">
                         <h1 class="text-h1 font-serif leading-tight mb-6">
-                            {{ result?.page?.homepage?.frame1?.header }}
+                            {{ cms?.frame1?.header }}
                         </h1>
                         <p class="text-lg max-w-[490px]">
-                            {{ result?.page?.homepage?.frame1?.description }}
+                            {{ cms?.frame1?.description }}
                         </p>
                     </div>
                     <div class="flex items-center space-x-10">
-                        <a :href="result?.page?.homepage?.frame1?.buttonLink">
+                        <a :href="cms?.frame1?.buttonLink">
                             <Button
                                 class="uppercase font-bold bg-primary-pink p-5 flex items-center space-x-5 hover:bg-opacity-80 transition rounded-lg"
                             >
-                                <p>{{ result?.page?.homepage?.frame1?.buttonText }}</p>
+                                <p>{{ cms?.frame1?.buttonText }}</p>
                                 <ArrowRightIcon class="w-6 h-6" />
                             </Button>
                         </a>
@@ -171,7 +183,7 @@ const gallery = [
                         <div class="w-full h-full">
                             <img
                                 class="w-full absolute bottom-0 left-0 object-contain"
-                                src="/images/heroimage.png"
+                                :src="cms?.frame1?.image?.node.sourceUrl"
                                 alt="image"
                             />
 
@@ -189,20 +201,24 @@ const gallery = [
     </section>
 
     <!-- Featured Models -->
-    <FeaturedModelSlider :items="items" />
+    <FeaturedModelSlider :items="featuredTalent" :header="cms?.frame2?.title" />
 
     <section class="bg-white">
         <div class="max-w-[1024px] m-auto px-10 py-16">
             <div class="grid grid-cols-3 gap-5">
                 <div
-                    v-for="(value, index) in values"
+                    v-for="(value, index) in cms?.frame3?.values"
                     :key="index"
                     class="flex items-center space-x-4"
                 >
-                    <img class="w-10 h-10 object-cover" :src="value.icon" alt="icon" />
+                    <img
+                        class="w-10 h-10 object-cover"
+                        :src="value.icon.node.sourceUrl"
+                        alt="icon"
+                    />
                     <div>
                         <h3 class="text-sm font-bold">{{ value.title }}</h3>
-                        <p class="text-xs text-neutral-500">{{ value.description }}</p>
+                        <p class="text-xs text-neutral-500">{{ value.shortDescription }}</p>
                     </div>
                 </div>
             </div>
@@ -212,27 +228,32 @@ const gallery = [
     <section class="bg-white">
         <div class="max-w-[1440px] m-auto px-10 py-10">
             <div class="max-w-[536px] text-center m-auto mb-16">
-                <h2 class="font-serif text-4xl mb-6">Stand Out with Promo Events</h2>
+                <h2 class="font-serif text-4xl mb-6">{{ cms?.frame4?.header }}</h2>
                 <p>
-                    Our models bring energy and style to any event. Create a memorable experience
-                    that puts your brand in the spotlight!
+                    {{ cms?.frame4?.description }}
                 </p>
             </div>
             <div class="grid grid-cols-3 gap-10">
-                <div v-for="(item, index) in gallery" :key="index">
+                <div v-for="(item, index) in cms?.frame4?.events" :key="index">
                     <div
                         class="aspect-w-[431] aspect-h-[485] rounded-lg overflow-hidden group/gallery"
                     >
-                        <img class="w-full h-full object-cover" :src="item.image" alt="image" />
+                        <img
+                            class="w-full h-full object-cover"
+                            :src="item.image.node.sourceUrl"
+                            alt="image"
+                        />
                         <div
                             class="w-full h-full absolute top-0 left-0 bg-black bg-opacity-50 flex items-center justify-end flex-col text-white space-y-4 p-6 opacity-0 group-hover/gallery:opacity-100 transition"
                         >
-                            <p>{{ item.name }}</p>
-                            <Button
-                                class="uppercase font-bold bg-primary-pink p-5 flex items-center space-x-5 hover:bg-opacity-80 transition rounded-lg"
-                            >
-                                <p>View Gallery</p>
-                            </Button>
+                            <p>{{ item.title }}</p>
+                            <a :href="item.link">
+                                <Button
+                                    class="uppercase font-bold bg-primary-pink p-5 flex items-center space-x-5 hover:bg-opacity-80 transition rounded-lg"
+                                >
+                                    <p>View Gallery</p>
+                                </Button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -276,7 +297,7 @@ const gallery = [
         </div>
     </section>
 
-    <ProjectSlider :items="items" />
+    <ProjectSlider :items="cms?.frame6" />
 
-    <PartnerSlider />
+    <PartnerSlider :items="cms?.frame7?.partners" />
 </template>

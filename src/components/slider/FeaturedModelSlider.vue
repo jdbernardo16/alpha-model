@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'; // Import ref
+import { ref, onMounted } from 'vue'; // Import ref
 import { ArrowRightIcon, ArrowLeftIcon } from '@heroicons/vue/24/solid';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
@@ -11,6 +11,9 @@ const props = defineProps({
     items: {
         type: Object,
     },
+    header: {
+        type: String,
+    },
 });
 
 // Add a ref to store the Swiper instance
@@ -19,30 +22,29 @@ const swiperInstance = ref<any>(null);
 // Function to set the Swiper instance
 const onSwiper = (swiper: any) => {
     swiperInstance.value = swiper;
+
+    // Ensure autoplay starts
+    if (swiper?.autoplay) {
+        swiper.autoplay.start();
+    }
 };
 
-// Methods to control Swiper navigation
 const slideNext = () => {
-    if (swiperInstance.value) {
-        swiperInstance.value.slideNext();
-    }
+    swiperInstance.value?.slideNext();
 };
 
 const slidePrev = () => {
-    if (swiperInstance.value) {
-        swiperInstance.value.slidePrev();
-    }
+    swiperInstance.value?.slidePrev();
 };
 </script>
 
 <template>
     <section class="bg-white h-[350px] relative">
         <div class="max-w-[1440px] left-1/2 -translate-x-1/2 px-10 absolute bottom-10 w-full">
-            <p class="font-bold text-xl mb-6 text-white">Featured Models</p>
+            <p class="font-bold text-xl mb-6 text-white">{{ header }}</p>
 
             <div class="flex items-center">
                 <div class="w-8/12">
-                    <!-- Bind the Swiper ref and use onSwiper to get the instance -->
                     <swiper
                         :slides-per-view="3"
                         :space-between="50"
@@ -54,26 +56,30 @@ const slidePrev = () => {
                         :modules="modules"
                         @swiper="onSwiper"
                     >
-                        <swiper-slide v-for="(item, index) in items" :key="index">
-                            <div
-                                class="aspect-w-[250] aspect-h-[350] bg-black rounded-lg overflow-hidden relative model-card"
-                            >
-                                <div class="w-full h-full">
-                                    <img
-                                        class="w-full h-full object-cover grayscale"
-                                        :src="item.image"
-                                        alt="model1"
-                                    />
-                                    <div
-                                        class="absolute bottom-0 left-0 w-full h-full bg-gradient-to-b from-primary-orange/[0.7] to-primary-pink/[0.7] flex flex-col justify-end text-white overlay-gradient transition"
-                                    >
-                                        <div class="model-card-content">
-                                            <p class="text-lg font-medium mb-1">{{ item.name }}</p>
-                                            <p>{{ item.location }}</p>
+                        <swiper-slide v-for="(item, index) in items || []" :key="index">
+                            <a :href="`/talents/${item.slug}`">
+                                <div
+                                    class="aspect-w-[250] aspect-h-[350] bg-black rounded-lg overflow-hidden relative model-card"
+                                >
+                                    <div class="w-full h-full">
+                                        <img
+                                            class="w-full h-full object-cover grayscale"
+                                            :src="item.talentContent?.thumbnail?.node.sourceUrl"
+                                            alt="model1"
+                                        />
+                                        <div
+                                            class="absolute bottom-0 left-0 w-full h-full bg-gradient-to-b from-primary-orange/[0.7] to-primary-pink/[0.7] flex flex-col justify-end text-white overlay-gradient transition"
+                                        >
+                                            <div class="model-card-content">
+                                                <p class="text-lg font-medium mb-1">
+                                                    {{ item.title }}
+                                                </p>
+                                                <p>{{ item.talentContent?.frame1?.location }}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </swiper-slide>
                     </swiper>
                 </div>

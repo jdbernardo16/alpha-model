@@ -16,10 +16,9 @@ const props = defineProps({
     <section>
         <div class="max-w-[1440px] m-auto px-10 py-16">
             <div class="max-w-[531px] mb-10">
-                <h2 class="text-2xl font-serif mb-6">Note Worthy Projects</h2>
+                <h2 class="text-2xl font-serif mb-6">{{ items?.header }}</h2>
                 <p>
-                    Explore our standout projects that showcase the talent, versatility, and
-                    professionalism of our models.
+                    {{ items?.description }}
                 </p>
             </div>
             <div>
@@ -33,11 +32,15 @@ const props = defineProps({
                         disableOnInteraction: false,
                     }"
                 >
-                    <swiper-slide v-for="(item, index) in items" :key="index">
+                    <swiper-slide v-for="(item, index) in items?.projects" :key="index">
                         <div
                             class="aspect-w-[350] aspect-h-[440] rounded-lg overflow-hidden bg-black"
                         >
-                            <img class="w-full h-full object-cover" :src="item.image" alt="image" />
+                            <img
+                                class="w-full h-full object-cover"
+                                :src="item.image?.node.sourceUrl"
+                                :alt="item.title"
+                            />
                         </div>
                     </swiper-slide>
                 </swiper>

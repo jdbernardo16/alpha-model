@@ -1,23 +1,83 @@
 export interface HomePageData {
-    page: {
-        id: string;
+    frame1: {
+        header: string;
+        description: string;
+        buttonText: string;
+        buttonLink: string;
+        image: {
+            node: {
+                id: string;
+                sourceUrl: string;
+                srcSet: string;
+                altText: string;
+            };
+        };
+    };
+    frame2: {
         title: string;
-        slug: string;
-        homepage: {
-            frame1: {
-                header: string;
-                description: string;
-                buttonText: string;
-                buttonLink: string;
-                image: {
-                    node: {
-                        id: string;
-                        sourceUrl: string;
-                        srcSet: string;
-                        altText: string;
-                    };
+    };
+    frame3: {
+        values: Array<{
+            icon: {
+                node: {
+                    sourceUrl: string;
                 };
             };
+            title: string;
+            shortDescription: string;
+        }>;
+    };
+    frame4: {
+        header: string;
+        description: string;
+        events: {
+            title: string;
+            link: string;
+            image: {
+                node: {
+                    sourceUrl: string;
+                };
+            };
+        }[];
+    };
+    frame6: {
+        header: string;
+        description: string;
+        projects: {
+            title: string;
+            image: {
+                node: {
+                    sourceUrl: string;
+                };
+            };
+        };
+    };
+    frame7: {
+        partners: {
+            name: string;
+            image: {
+                node: {
+                    sourceUrl: string;
+                };
+            };
+        }[];
+    };
+}
+
+export interface FeaturedTalentData {
+    id: string;
+    title: string;
+    isFeatured: boolean;
+    slug: string;
+    talentContent?: {
+        thumbnail?: {
+            node: {
+                sourceUrl: string;
+            };
+        };
+        frame1?: {
+            location: string;
+            tags: string;
         };
     };
 }

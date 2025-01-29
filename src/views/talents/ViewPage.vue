@@ -103,7 +103,7 @@ onMounted(async () => {
     }
 
     try {
-        const response = await axios.post('http://localhost:8000/graphql', {
+        const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
             query: GET_TALENT_BY_SLUG,
             variables: { slug },
         });

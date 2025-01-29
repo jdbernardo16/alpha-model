@@ -12,15 +12,6 @@ defineProps({
 });
 
 const modules = [Autoplay, FreeMode];
-
-// Partner logos (replace with your actual image paths)
-const partners = [
-    '/images/partner1.png',
-    '/images/partner2.png',
-    '/images/partner3.png',
-    '/images/partner4.png',
-    '/images/partner5.png',
-];
 </script>
 
 <template>
