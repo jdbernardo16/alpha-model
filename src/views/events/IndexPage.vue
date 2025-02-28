@@ -6,6 +6,7 @@ import Countdown from '@/components/general/Countdown.vue';
 import { MapPinIcon } from '@heroicons/vue/24/outline';
 import { formatDate } from '@/utils/dateFormatter';
 import VueEasyLightbox from 'vue-easy-lightbox';
+import type { PromoEventsData } from '@/types';
 
 const GET_PROMO_EVENTS = `
     query getPromoEvents {

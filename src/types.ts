@@ -121,3 +121,74 @@ export interface Talent {
         }[];
     };
 }
+
+export interface PromoEventsData {
+    defaultBanner: {
+        eyebrow: string;
+        title: string;
+        description: string;
+        showThisFrame: boolean;
+    };
+    upcomingEvents: {
+        title: string;
+        description: string;
+        eventDateAndTime: string;
+        showThisFrame: boolean;
+        background: {
+            node: {
+                id: string;
+                sourceUrl: string;
+                srcSet: string;
+                altText: string;
+            };
+        };
+    };
+    pastEvents: {
+        header: string;
+        title: string;
+        description: string;
+        events: {
+            thumbnail: {
+                node: {
+                    id: string;
+                    sourceUrl: string;
+                    srcSet: string;
+                    altText: string;
+                };
+            };
+            date: string;
+            title: string;
+            subHeader: string;
+            details: string;
+            gallery: {
+                nodes: {
+                    id: string;
+                    sourceUrl: string;
+                    srcSet: string;
+                    altText: string;
+                }[];
+            };
+        }[];
+    };
+    highlights: {
+        title: string;
+        description: string;
+        highlightGallery: {
+            nodes: {
+                id: string;
+                sourceUrl: string;
+                srcSet: string;
+                altText: string;
+            }[];
+        };
+    };
+    faqs: {
+        title: string;
+        description: string;
+        buttonText: string;
+        faqItems: {
+            question: string;
+            answer: string;
+        }[];
+    };
+}
