@@ -140,25 +140,29 @@ onMounted(async () => {
 </script>
 
 <template>
-    <section class="h-[calc(100vh-84px)] bg-[#1C1B1B] relative">
+    <section class="lg:h-[calc(100vh-84px)] bg-[#1C1B1B] relative">
         <img
             class="w-full h-full absolute top-0 left-0"
             src="/images/herobackground.png"
             alt="UAT Hero Background"
         />
-        <div class="relative z-[1] text-white flex space-x-20 px-10 justify-between">
+        <div
+            class="relative z-[1] text-white flex lg:flex-row flex-col lg:space-x-20 lg:px-10 justify-between lg:space-y-0 space-y-10"
+        >
             <!-- Left Side -->
-            <div class="w-1/2">
-                <div class="w-[647px] pt-20">
+            <div class="w-full lg:w-1/2 lg:px-0 px-4">
+                <div class="w-full lg:w-[647px] pt-20 text-center lg:text-left">
                     <div class="mb-10">
-                        <h1 class="text-h1 font-serif leading-tight mb-6">
+                        <h1 class="text-[3rem] lg:text-h1 font-serif leading-tight mb-6">
                             {{ cms?.frame1?.header }}
                         </h1>
-                        <p class="text-lg max-w-[490px]">
+                        <p class="lg:text-lg max-w-[490px] lg:m-0 m-auto">
                             {{ cms?.frame1?.description }}
                         </p>
                     </div>
-                    <div class="flex items-center space-x-10">
+                    <div
+                        class="flex lg:flex-row flex-col items-center lg:space-x-10 lg:space-y-0 space-y-10"
+                    >
                         <a :href="cms?.frame1?.buttonLink">
                             <Button
                                 class="uppercase font-bold bg-primary-pink p-5 flex items-center space-x-5 hover:bg-opacity-80 transition rounded-lg"
@@ -175,8 +179,8 @@ onMounted(async () => {
                 </div>
             </div>
             <!-- Right Side -->
-            <div class="w-1/2">
-                <div class="w-[70%] m-auto">
+            <div class="w-full lg:w-1/2 lg:bg-transparent bg-white">
+                <div class="lg:w-[70%] m-auto">
                     <div
                         class="aspect-w-[482] aspect-h-[736] bg-primary-pink overflow-hidden rounded-b-full relative m-auto"
                     >
@@ -204,8 +208,8 @@ onMounted(async () => {
     <FeaturedModelSlider :items="featuredTalent" :header="cms?.frame2?.title" />
 
     <section class="bg-white">
-        <div class="max-w-[1024px] m-auto px-10 py-16">
-            <div class="grid grid-cols-3 gap-5">
+        <div class="max-w-[1024px] m-auto px-4 lg:px-10 py-10 lg:py-16">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-5 lg:w-auto w-fit m-auto">
                 <div
                     v-for="(value, index) in cms?.frame3?.values"
                     :key="index"
@@ -226,14 +230,14 @@ onMounted(async () => {
     </section>
 
     <section class="bg-white">
-        <div class="max-w-[1440px] m-auto px-10 py-10">
+        <div class="max-w-[1440px] m-auto px-4 lg:px-10 py-10">
             <div class="max-w-[536px] text-center m-auto mb-16">
                 <h2 class="font-serif text-4xl mb-6">{{ cms?.frame4?.header }}</h2>
                 <p>
                     {{ cms?.frame4?.description }}
                 </p>
             </div>
-            <div class="grid grid-cols-3 gap-10">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
                 <div v-for="(item, index) in cms?.frame4?.events" :key="index">
                     <div
                         class="aspect-w-[431] aspect-h-[485] rounded-lg overflow-hidden group/gallery"
@@ -262,16 +266,19 @@ onMounted(async () => {
     </section>
 
     <section>
-        <div class="max-w-[1440px] m-auto px-10 py-16">
-            <div class="flex items-center justify-between space-x-10">
-                <div class="w-1/2">
+        <div class="max-w-[1440px] m-auto px-4 lg:px-10 py-10 lg:py-16">
+            <p class="text-xl font-bold mb-6 lg:hidden block">Blogs</p>
+            <div
+                class="flex lg:flex-row flex-col items-center justify-between lg:space-x-10 lg:space-y-0 space-y-10"
+            >
+                <div class="w-full lg:w-1/2">
                     <div class="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden">
                         <img class="w-full object-cover" src="/images/blog1.png" alt="blog" />
                     </div>
                 </div>
-                <div class="w-1/2">
+                <div class="w-full lg:w-1/2">
                     <div class="mb-6">
-                        <p class="text-xl font-bold mb-3">Blogs</p>
+                        <p class="text-xl font-bold mb-3 lg:block hidden">Blogs</p>
                         <h3 class="text-3xl font-serif mb-3 line-clamp-2">
                             Empowerment for Models:5 Ways to Prioritize Self Care for prolonged your
                             career as a model

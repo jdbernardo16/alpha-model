@@ -39,15 +39,17 @@ const slidePrev = () => {
 </script>
 
 <template>
-    <section class="bg-white h-[350px] relative">
-        <div class="max-w-[1440px] left-1/2 -translate-x-1/2 px-10 absolute bottom-10 w-full">
-            <p class="font-bold text-xl mb-6 text-white">{{ header }}</p>
+    <section class="bg-white lg:h-[350px] relative">
+        <div
+            class="max-w-[1440px] lg:left-1/2 lg:-translate-x-1/2 px-4 lg:px-10 lg:absolute lg:bottom-10 w-full lg:pt-0 pt-10"
+        >
+            <p class="font-bold text-xl mb-6 lg:text-white">{{ header }}</p>
 
             <div class="flex items-center">
-                <div class="w-8/12">
+                <div class="w-full lg:w-8/12">
                     <swiper
-                        :slides-per-view="3"
-                        :space-between="50"
+                        :slides-per-view="1"
+                        :space-between="20"
                         :autoplay="{
                             delay: 5000,
                             disableOnInteraction: false,
@@ -55,6 +57,16 @@ const slidePrev = () => {
                         :loop="true"
                         :modules="modules"
                         @swiper="onSwiper"
+                        :breakpoints="{
+                            768: {
+                                slidesPerView: 2,
+                                spaceBetween: 30,
+                            },
+                            1024: {
+                                slidesPerView: 3,
+                                spaceBetween: 50,
+                            },
+                        }"
                     >
                         <swiper-slide v-for="(item, index) in items || []" :key="index">
                             <a :href="`/talents/${item.slug}`">
@@ -84,7 +96,7 @@ const slidePrev = () => {
                     </swiper>
                 </div>
 
-                <div class="w-4/12 text-center">
+                <div class="hidden lg:block lg:w-4/12 text-center">
                     <div class="flex items-center space-x-10 m-auto w-fit">
                         <!-- Bind click events to the Swiper methods -->
                         <ArrowLeftIcon
@@ -117,6 +129,18 @@ const slidePrev = () => {
     }
 
     &:hover {
+        .overlay-gradient {
+            max-height: 100%;
+        }
+        .model-card-content {
+            opacity: 1;
+            padding: 20px;
+        }
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .model-card {
         .overlay-gradient {
             max-height: 100%;
         }

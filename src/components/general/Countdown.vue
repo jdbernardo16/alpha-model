@@ -1,29 +1,29 @@
 <template>
     <div v-if="timeRemaining">
-        <div class="flex items-center space-x-10">
+        <div class="flex items-center space-x-5 lg:space-x-10">
             <div class="text-center">
-                <p class="text-[4rem] font-bold font-serif text-primary-pink">
+                <p class="text-3xl lg:text-[4rem] font-bold font-serif text-primary-pink">
                     {{ timeRemaining.days }}
                 </p>
-                <p class="text-3xl">Days</p>
+                <p class="lg:text-3xl">Days</p>
             </div>
             <div class="text-center">
-                <p class="text-[4rem] font-bold font-serif text-primary-pink">
+                <p class="text-3xl lg:text-[4rem] font-bold font-serif text-primary-pink">
                     {{ timeRemaining.hours }}
                 </p>
-                <p class="text-3xl">Hours</p>
+                <p class="lg:text-3xl">Hours</p>
             </div>
             <div class="text-center">
-                <p class="text-[4rem] font-bold font-serif text-primary-pink">
+                <p class="text-3xl lg:text-[4rem] font-bold font-serif text-primary-pink">
                     {{ timeRemaining.minutes }}
                 </p>
-                <p class="text-3xl">Minutes</p>
+                <p class="lg:text-3xl">Minutes</p>
             </div>
             <div class="text-center">
-                <p class="text-[4rem] font-bold font-serif text-primary-pink">
+                <p class="text-3xl lg:text-[4rem] font-bold font-serif text-primary-pink">
                     {{ timeRemaining.seconds }}
                 </p>
-                <p class="text-3xl">Seconds</p>
+                <p class="lg:text-3xl">Seconds</p>
             </div>
         </div>
     </div>

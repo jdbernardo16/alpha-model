@@ -122,38 +122,37 @@ onMounted(async () => {
 </script>
 
 <template>
-    <section class="p-20 h-[120vh] relative">
+    <section class="lg:p-20 h-[calc(100vh-71px)] lg:h-[120vh] relative">
         <div
             class="w-full h-full bg-[url(/images/adriana.png)] bg-fixed flex items-center justify-center bg-cover bg-center"
             :style="`background-image: url(${talent?.talentContent?.frame1?.backgroundImage?.node.sourceUrl})`"
         >
             <div class="text-center">
                 <div
-                    class="font-figtree text-white text-h1 uppercase"
+                    class="font-figtree text-white text-[3rem] lg:text-h1 uppercase"
                     v-html="talent?.talentContent?.frame1?.fullName"
                 />
                 <p class="text-white text-xl mb-10">
                     {{ talent?.talentContent?.frame1?.location }}
                 </p>
-                <p class="font-charmonman text-neutral-300 text-5xl">
+                <p class="font-charmonman text-neutral-300 text-2xl lg:text-5xl">
                     {{ talent?.talentContent?.frame1?.tags }}
                 </p>
             </div>
         </div>
-        <div class="absolute top-1/2 -translate-y-1/2 space-y-5 right-0 pr-5">
+        <div
+            class="absolute flex lg:flex-col flex-row bottom-5 right-1/2 lg:translate-x-0 translate-x-1/2 lg:bottom-1/2 lg:translate-y-1/2 space-x-5 lg:space-x-0 lg:space-y-5 lg:right-0 lg:pr-5"
+        >
             <a
                 v-for="(social, index) in talent?.talentContent?.socialMedia"
                 :key="index"
                 :href="social.link"
                 target="_blank"
-                class="block"
+                class="block lg:invert-0 invert"
             >
                 <img :src="social?.icon?.node.sourceUrl" alt="tiktok" />
             </a>
         </div>
-        <!-- <div class="absolute bottom-1/2 translate-y-[300px] left-1/2 z-[1]">
-            <img src="/images/arrow-down.svg" alt="Arrow Down" />
-        </div> -->
     </section>
 
     <section class="relative">
@@ -161,20 +160,26 @@ onMounted(async () => {
             class="w-full h-[420px] bg-fixed bg-cover bg-top"
             :style="`background-image: url(${talent?.talentContent?.frame2?.bannerImage?.node.sourceUrl})`"
         ></div>
-        <div class="max-w-[1200px] m-auto relative w-full py-12">
+        <div class="max-w-[1200px] m-auto relative w-full lg:py-12">
             <div
-                class="bg-black w-full h-[300px] pt-20 text-white text-center absolute -top-[200px]"
+                class="bg-black w-full lg:h-[300px] py-10 lg:pt-20 text-white text-center lg:absolute lg:-top-[200px]"
             >
-                <div class="text-h1" v-html="talent?.talentContent?.frame2?.bannerText"></div>
+                <div
+                    class="text-4xl lg:text-h1"
+                    v-html="talent?.talentContent?.frame2?.bannerText"
+                ></div>
             </div>
-            <div class="relative">
+            <div class="relative lg:py-0 py-5">
                 <LatestPostSlider :items="talent?.talentContent?.frame2?.images?.nodes" />
             </div>
         </div>
     </section>
     <section>
-        <div class="text-center max-w-[1440px] m-auto">
-            <h3 class="text-6xl mb-20" v-html="talent?.talentContent?.frame2?.partnersTitle"></h3>
+        <div class="text-center max-w-[1440px] m-auto px-4 lg:px-0">
+            <h3
+                class="text-3xl lg:text-6xl mb-10 lg:mb-20 whitespace-pre-wrap"
+                v-html="talent?.talentContent?.frame2?.partnersTitle"
+            ></h3>
             <div>
                 <PartnerSlider :items="talent?.talentContent?.frame2?.partners" />
             </div>
@@ -182,11 +187,14 @@ onMounted(async () => {
     </section>
 
     <section class="bg-neutral-100">
-        <div class="max-w-[1440px] m-auto px-16 py-16">
-            <div class="text-center mb-20">
-                <h3 class="text-6xl" v-html="talent?.talentContent?.frame3?.frameTitle"></h3>
+        <div class="max-w-[1440px] m-auto lg:px-16 lg:py-16 px-4 py-10">
+            <div class="text-center mb-10 lg:mb-20">
+                <h3
+                    class="text-3xl lg:text-6xl"
+                    v-html="talent?.talentContent?.frame3?.frameTitle"
+                ></h3>
             </div>
-            <div class="grid grid-cols-4 gap-5">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
                 <div
                     v-for="(image, index) in talent?.talentContent?.frame3?.portfolioImages?.nodes"
                     :key="index"
@@ -204,19 +212,22 @@ onMounted(async () => {
     </section>
 
     <section>
-        <div class="px-16 max-w-[1440px] m-auto pb-[120px]">
-            <div class="flex">
-                <div class="w-1/2 space-y-10 pt-20">
+        <div class="px-4 lg:px-16 max-w-[1440px] m-auto pb-20 lg:pb-[120px]">
+            <div class="flex lg:flex-row flex-col lg:space-y-0 space-y-10">
+                <div class="w-full lg:w-1/2 space-y-10 pt-10 lg:pt-20">
                     <div>
-                        <p class="text-[4rem]" v-html="talent?.talentContent?.frame4?.title"></p>
+                        <p
+                            class="text-3xl lg:text-[4rem]"
+                            v-html="talent?.talentContent?.frame4?.title"
+                        ></p>
                     </div>
-                    <div class="pr-20" v-html="talent?.talentContent?.frame4?.description"></div>
+                    <div class="lg:pr-20" v-html="talent?.talentContent?.frame4?.description"></div>
                 </div>
-                <div class="w-1/2 px-10">
+                <div class="w-full lg:w-1/2 px-4 lg:px-10">
                     <div class="aspect-w-[616] aspect-h-[885] relative">
                         <div>
                             <div
-                                class="bg-black w-full h-full absolute top-10 right-10 z-[1]"
+                                class="bg-black w-full h-full absolute top-5 lg:top-10 right-5 lg:right-10 z-[1]"
                             ></div>
                         </div>
                         <img
@@ -235,12 +246,12 @@ onMounted(async () => {
             class="w-full h-[420px] bg-cover bg-fixed bg-top"
             :style="`background-image: url(${talent?.talentContent?.frame5?.bannerImage?.node.sourceUrl})`"
         ></div>
-        <div class="max-w-[1034px] m-auto -translate-y-20">
-            <div class="w-full p-[50px] bg-neutral-100">
-                <p class="text-6xl text-center mb-20"><b>TOUCH</b> BASE</p>
+        <div class="max-w-[1034px] m-auto lg:-translate-y-20">
+            <div class="w-full px-4 py-10 lg:p-[50px] bg-neutral-100">
+                <p class="text-3xl lg:text-6xl text-center mb-20"><b>TOUCH</b> BASE</p>
 
-                <div class="flex space-x-10">
-                    <div class="w-4/12">
+                <div class="flex flex-col lg:flex-row lg:space-y-0 space-y-10 lg:space-x-10">
+                    <div class="w-full lg:w-4/12">
                         <div class="flex items-center space-x-6 mb-6">
                             <a
                                 v-for="(social, index) in talent?.talentContent?.socialMedia"
@@ -253,7 +264,7 @@ onMounted(async () => {
                         </div>
                         <div v-html="talent?.talentContent?.frame5?.contactText"></div>
                     </div>
-                    <div class="w-8/12 space-y-5">
+                    <div class="w-full lg:w-8/12 space-y-5">
                         <input
                             type="text"
                             placeholder="Name"

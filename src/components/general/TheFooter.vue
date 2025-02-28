@@ -1,9 +1,9 @@
 <template>
     <footer class="bg-black w-full relative text-white">
         <img src="/images/overlay.png" alt="overlay" class="absolute top-0 left-0 w-full h-full" />
-        <div class="max-w-[1440px] m-auto px-10">
+        <div class="max-w-[1440px] m-auto px-4 lg:px-10">
             <div
-                class="w-full relative z-[1] flex justify-between border-b border-neutral-500 py-16"
+                class="w-full relative z-[1] flex lg:flex-row flex-col lg:space-y-0 space-y-10 justify-between border-b border-neutral-500 py-10 lg:py-16"
             >
                 <div class="space-y-2.5">
                     <img src="/images/logo.png" alt="logo" class="w-20" />
@@ -14,7 +14,7 @@
                     </div>
                 </div>
 
-                <div class="flex space-x-10">
+                <div class="flex lg:flex-row flex-col lg:space-y-0 space-y-10 lg:space-x-10">
                     <div>
                         <p class="font-bold mb-2.5">Information</p>
                         <div class="space-y-2.5 flex flex-col">

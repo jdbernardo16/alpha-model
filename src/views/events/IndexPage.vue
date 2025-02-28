@@ -108,8 +108,26 @@ onMounted(async () => {
     }
 });
 
-const showImage = (i: number) => {
-    index.value = i;
+// Add these to your ref declarations
+const currentEventIndex = ref(-1);
+const currentEventGallery = computed(() => {
+    if (
+        currentEventIndex.value >= 0 &&
+        cms.value?.pastEvents.events[currentEventIndex.value]?.gallery?.nodes
+    ) {
+        return cms.value.pastEvents.events[currentEventIndex.value].gallery.nodes.map((node) => ({
+            src: node.sourceUrl,
+            srcset: node.srcSet,
+            title: node.altText || 'Event Image',
+        }));
+    }
+    return [];
+});
+
+// Replace your showImage function with this
+const showImage = (eventIndex: number, imageIndex: number = 0) => {
+    currentEventIndex.value = eventIndex;
+    index.value = imageIndex;
     visible.value = true;
 };
 
@@ -142,11 +160,11 @@ const onHide = () => {
                 class="w-full h-full object-cover top-0 left-0 opacity-20"
             />
         </div>
-        <div class="max-w-[1440px] mx-auto px-20 py-20 relative">
+        <div class="max-w-[1440px] mx-auto px-4 lg:px-20 py-20 relative">
             <div class="text-center space-y-10">
                 <div>
                     <h1
-                        class="text-[4rem] font-bold mb-4 leading-tight whitespace-pre-wrap"
+                        class="text-3xl lg:text-[4rem] font-bold mb-4 leading-tight whitespace-pre-wrap"
                         v-html="cms?.upcomingEvents.title"
                     />
                     <p class="mb-4">{{ cms?.upcomingEvents.description }}</p>
@@ -160,8 +178,8 @@ const onHide = () => {
         </div>
     </section>
     <section>
-        <div class="max-w-[1440px] mx-auto px-20 py-20">
-            <div class="mb-20 space-y-4 w-1/2">
+        <div class="max-w-[1440px] mx-auto px-4 lg:px-20 py-10 lg:py-20">
+            <div class="mb-20 space-y-4 w-full lg:w-1/2">
                 <p class="font-semibold">{{ cms?.pastEvents.header }}</p>
                 <h2 class="text-4xl font-bold mb-2">{{ cms?.pastEvents.title }}</h2>
                 <p class="mb-8">
@@ -173,9 +191,9 @@ const onHide = () => {
                 <div
                     v-for="event in cms?.pastEvents.events"
                     :key="event.date + event.title"
-                    class="flex items-center space-x-20 pt-20 first:pt-0"
+                    class="flex lg:flex-row flex-col items-center lg:space-x-20 pt-20 first:pt-0"
                 >
-                    <div class="w-1/2 space-y-6">
+                    <div class="w-full lg:w-1/2 space-y-6 lg:order-1 order-2 lg:mt-0 mt-10">
                         <p class="text-gray-600">{{ formatDate(event.date) }}</p>
                         <h3 class="text-xl font-bold mb-2">{{ event.title }}</h3>
                         <div>
@@ -188,7 +206,7 @@ const onHide = () => {
                             <p class="text-gray-600" v-html="event.details"></p>
                         </div>
                     </div>
-                    <div class="w-1/2 relative">
+                    <div class="w-full lg:w-1/2 relative lg:order-2 order-1">
                         <div class="aspect-w-[500] aspect-h-[600] w-full group/item cursor-pointer">
                             <img
                                 v-if="event.thumbnail?.node"
@@ -201,9 +219,8 @@ const onHide = () => {
                                 class="absolute w-full h-full bg-black/[0.5] transition group-hover/item:opacity-100 opacity-0 flex items-center justify-center"
                                 @click="
                                     showImage(
-                                        cms?.pastEvents.events
-                                            .flatMap((e) => e.gallery?.nodes)
-                                            .findIndex((g) => g === event.gallery?.nodes),
+                                        cms?.pastEvents.events.findIndex((e) => e === event),
+                                        0, // Start with first image in the gallery
                                     )
                                 "
                             >
@@ -222,7 +239,7 @@ const onHide = () => {
         </div>
     </section>
     <section class="bg-black w-full">
-        <div class="max-w-[1440px] m-auto px-20 py-20">
+        <div class="max-w-[1440px] m-auto px-4 lg:px-20 py-10 lg:py-20">
             <div class="text-white text-center max-w-[768px] m-auto space-y-6 mb-20">
                 <h2 class="font-bold text-4xl">{{ cms?.highlights.title }}</h2>
                 <p>{{ cms?.highlights.description }}</p>
@@ -245,9 +262,9 @@ const onHide = () => {
         </div>
     </section>
     <section class="py-12 bg-gray-100">
-        <div class="max-w-[1440px] mx-auto px-20">
-            <div class="flex space-x-20">
-                <div class="w-1/2 space-y-4">
+        <div class="max-w-[1440px] mx-auto px-4 lg:px-20">
+            <div class="flex flex-col lg:flex-row lg:space-x-20 lg:space-y-0 space-y-10">
+                <div class="w-full lg:w-1/2 space-y-4">
                     <h2 class="font-semibold text-3xl">{{ cms?.faqs.title }}</h2>
                     <p class="mb-8">
                         {{ cms?.faqs.description }}
@@ -260,7 +277,7 @@ const onHide = () => {
                         </Button>
                     </a>
                 </div>
-                <div class="w-1/2 space-y-4">
+                <div class="w-full lg:w-1/2 space-y-4">
                     <Accordion
                         v-for="(faq, index) in cms?.faqs.faqItems"
                         :key="index"
@@ -274,15 +291,7 @@ const onHide = () => {
 
     <VueEasyLightbox
         :visible="visible"
-        :imgs="
-            cms?.pastEvents.events.flatMap((event) =>
-                event.gallery?.nodes.map((node) => ({
-                    src: node.sourceUrl,
-                    srcset: node.srcSet,
-                    title: node.altText || 'Event Image',
-                })),
-            )
-        "
+        :imgs="currentEventGallery"
         :index="index"
         @hide="onHide"
     ></VueEasyLightbox>

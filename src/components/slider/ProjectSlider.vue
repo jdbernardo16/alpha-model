@@ -14,7 +14,7 @@ const props = defineProps({
 </script>
 <template>
     <section>
-        <div class="max-w-[1440px] m-auto px-10 py-16">
+        <div class="max-w-[1440px] m-auto px-4 lg:px-10 py-10 lg:py-16">
             <div class="max-w-[531px] mb-10">
                 <h2 class="text-2xl font-serif mb-6">{{ items?.header }}</h2>
                 <p>
@@ -23,13 +23,23 @@ const props = defineProps({
             </div>
             <div>
                 <swiper
-                    :slides-per-view="4"
-                    :space-between="50"
+                    :slides-per-view="1"
+                    :space-between="24"
                     :loop="true"
                     :modules="modules"
                     :autoplay="{
                         delay: 5000,
                         disableOnInteraction: false,
+                    }"
+                    :breakpoints="{
+                        768: {
+                            slidesPerView: 2,
+                            spaceBetween: 30,
+                        },
+                        1024: {
+                            slidesPerView: 4,
+                            spaceBetween: 50,
+                        },
                     }"
                 >
                     <swiper-slide v-for="(item, index) in items?.projects" :key="index">
