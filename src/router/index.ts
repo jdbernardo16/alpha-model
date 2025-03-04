@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '../views/HomePage.vue';
 import TalentIndex from '../views/talents/IndexPage.vue';
 import TalentView from '../views/talents/ViewPage.vue';
-import PricingTable from '../components/PricingTable.vue';
 import CheckoutPage from '../components/CheckoutPage.vue';
 
 const router = createRouter({

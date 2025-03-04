@@ -5,11 +5,26 @@ import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 
+interface FeaturedModelItem {
+    slug: string;
+    talentContent?: {
+        thumbnail?: {
+            node: {
+                sourceUrl: string;
+            };
+        };
+        frame1?: {
+            location: string;
+        };
+    };
+    title: string;
+}
+
 const modules = [Autoplay, Pagination, Navigation];
 
 const props = defineProps({
     items: {
-        type: Object,
+        type: Array as () => FeaturedModelItem[] | undefined,
     },
     header: {
         type: String,

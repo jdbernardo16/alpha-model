@@ -152,7 +152,7 @@ const onHide = () => {
         </div>
     </section>
     <section
-        class="w-full relative text-white min-h-[600px]"
+        class="w-full relative text-white lg:min-h-[600px]"
         v-if="cms?.upcomingEvents.showThisFrame ?? true"
     >
         <div class="bg-black absolute w-full top-0 left-0 h-full">
@@ -226,7 +226,8 @@ const onHide = () => {
                                 class="absolute w-full h-full bg-black/[0.5] transition group-hover/item:opacity-100 opacity-0 flex items-center justify-center"
                                 @click="
                                     showImage(
-                                        cms?.pastEvents.events.findIndex((e) => e === event),
+                                        cms?.pastEvents?.events?.findIndex((e) => e === event) ??
+                                            -1,
                                         0, // Start with first image in the gallery
                                     )
                                 "

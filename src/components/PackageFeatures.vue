@@ -1,6 +1,6 @@
 <template>
     <div
-        class="divide-y divide-gray-200 rounded-2xl border shadow-xs relative ring-2 ring-pink-600 border-pink-600 max-w-[500px] m-auto"
+        class="divide-y divide-gray-200 rounded-2xl border shadow-xs relative ring-2 ring-pink-600 border-pink-600 m-auto"
     >
         <!-- Package header -->
         <div class="p-6 sm:px-8">

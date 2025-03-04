@@ -1,10 +1,19 @@
 <template>
     <section>
         <div
-            class="mx-auto max-w-7xl p-6 lg:px-8 bg-white rounded-lg grid grid-cols-1 md:grid-cols-10 gap-8 py-10 lg:py-20"
+            class="mx-auto max-w-7xl p-6 lg:px-8 bg-white rounded-lg grid grid-cols-1 md:grid-cols-10 gap-10 lg:gap-20 py-10 lg:py-20"
         >
             <div class="md:col-span-6">
-                <h2 class="text-2xl font-bold mb-4 lg:hidden block">Checkout</h2>
+                <div class="mb-6">
+                    <h1 class="text-2xl lg:text-4xl mb-4 font-bold leading-tight">
+                        Sponsorship Package Details
+                    </h1>
+                    <p>
+                        After your purchase, one of our team will reach out to you as soon as
+                        possible.
+                    </p>
+                </div>
+                <h2 class="text-xl lg:text-2xl font-bold mb-4 lg:hidden block">Checkout</h2>
                 <PackageFeatures
                     :package-name="formData.packageName"
                     :package-price="formData.packagePrice"
