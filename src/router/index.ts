@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '../views/HomePage.vue';
 import TalentIndex from '../views/talents/IndexPage.vue';
 import TalentView from '../views/talents/ViewPage.vue';
+import PricingTable from '../components/PricingTable.vue';
+import CheckoutPage from '../components/CheckoutPage.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,6 +37,18 @@ const router = createRouter({
             path: '/events',
             name: 'events',
             component: () => import('../views/events/IndexPage.vue'),
+        },
+        {
+            path: '/checkout/:packageName/:packagePrice/:packageFeatures',
+            name: 'Checkout',
+            component: CheckoutPage,
+            props: true,
+        },
+        {
+            path: '/success',
+            name: 'success',
+            component: () => import('../views/events/SuccessPage.vue'),
+            props: true,
         },
     ],
     scrollBehavior(to, from, savedPosition) {

@@ -3,10 +3,10 @@ import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import Accordion from '@/components/general/Accordion.vue';
 import Countdown from '@/components/general/Countdown.vue';
-import { MapPinIcon } from '@heroicons/vue/24/outline';
 import { formatDate } from '@/utils/dateFormatter';
 import VueEasyLightbox from 'vue-easy-lightbox';
 import type { PromoEventsData } from '@/types';
+import PricingTable from '@/components/PricingTable.vue';
 
 const GET_PROMO_EVENTS = `
     query getPromoEvents {
@@ -151,8 +151,11 @@ const onHide = () => {
             </p>
         </div>
     </section>
-    <section class="w-full relative text-white" v-if="cms?.upcomingEvents.showThisFrame">
-        <div class="bg-black absolute w-full h-full top-0 left-0">
+    <section
+        class="w-full relative text-white min-h-[600px]"
+        v-if="cms?.upcomingEvents.showThisFrame ?? true"
+    >
+        <div class="bg-black absolute w-full top-0 left-0 h-full">
             <img
                 v-if="cms?.upcomingEvents.background.node"
                 :src="cms.upcomingEvents.background.node.sourceUrl"
@@ -177,6 +180,9 @@ const onHide = () => {
                 </div>
             </div>
         </div>
+    </section>
+    <section class="border-b">
+        <PricingTable />
     </section>
     <section>
         <div class="max-w-[1440px] mx-auto px-4 lg:px-20 py-10 lg:py-20">
