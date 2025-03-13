@@ -139,7 +139,7 @@ const onHide = () => {
 <template>
     <section
         v-if="cms?.defaultBanner.showThisFrame"
-        class="w-full bg-gradient-to-b from-primary-orange/[0.8] to-primary-pink/[0.8]"
+        class="w-full bg-gradient-to-b from-primary-orange/[0.8] to-primary-gold/[0.8]"
     >
         <div class="max-w-[768px] m-auto text-white text-center py-[112px]">
             <p class="font-medium">{{ cms?.defaultBanner.eyebrow }}</p>
@@ -279,7 +279,7 @@ const onHide = () => {
                     </p>
                     <a href="#" class="block">
                         <Button
-                            class="uppercase font-bold bg-primary-pink px-5 py-3 flex items-center space-x-5 hover:bg-opacity-80 transition rounded-lg text-white"
+                            class="uppercase font-bold bg-primary-gold px-5 py-3 flex items-center space-x-5 hover:bg-opacity-80 transition rounded-lg text-white"
                         >
                             <p>{{ cms?.faqs.buttonText }}</p>
                         </Button>

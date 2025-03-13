@@ -22,7 +22,7 @@
                 <p class="mb-4">We will be in touch with you shortly.</p>
                 <a href="/" class="block w-fit m-auto mt-4">
                     <Button
-                        class="uppercase font-bold bg-primary-pink p-5 flex items-center space-x-5 hover:bg-opacity-80 transition rounded-lg text-white"
+                        class="uppercase font-bold bg-primary-gold p-5 flex items-center space-x-5 hover:bg-opacity-80 transition rounded-lg text-white"
                     >
                         <p>Back to Home</p>
                     </Button>

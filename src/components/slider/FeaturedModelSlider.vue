@@ -54,11 +54,9 @@ const slidePrev = () => {
 </script>
 
 <template>
-    <section class="bg-white lg:h-[350px] relative">
-        <div
-            class="max-w-[1440px] lg:left-1/2 lg:-translate-x-1/2 px-4 lg:px-10 lg:absolute lg:bottom-10 w-full lg:pt-0 pt-10"
-        >
-            <p class="font-bold text-xl mb-6 lg:text-white">{{ header }}</p>
+    <section class="bg-white relative">
+        <div class="max-w-[1440px] w-full py-10 px-4 lg:px-20 m-auto">
+            <p class="font-bold text-xl mb-6 lg:text-black">{{ header }}</p>
 
             <div class="flex items-center">
                 <div class="w-full lg:w-8/12">
@@ -95,7 +93,7 @@ const slidePrev = () => {
                                             alt="model1"
                                         />
                                         <div
-                                            class="absolute bottom-0 left-0 w-full h-full bg-gradient-to-b from-primary-orange/[0.7] to-primary-pink/[0.7] flex flex-col justify-end text-white overlay-gradient transition"
+                                            class="absolute bottom-0 left-0 w-full h-full bg-gradient-to-b from-primary-orange/[0.7] to-primary-gold/[0.7] flex flex-col justify-end text-white overlay-gradient transition"
                                         >
                                             <div class="model-card-content">
                                                 <p class="text-lg font-medium mb-1">
@@ -115,11 +113,11 @@ const slidePrev = () => {
                     <div class="flex items-center space-x-10 m-auto w-fit">
                         <!-- Bind click events to the Swiper methods -->
                         <ArrowLeftIcon
-                            class="size-10 cursor-pointer hover:text-primary-pink transition"
+                            class="size-10 cursor-pointer hover:text-primary-gold transition"
                             @click="slidePrev"
                         />
                         <ArrowRightIcon
-                            class="size-10 cursor-pointer hover:text-primary-pink transition"
+                            class="size-10 cursor-pointer hover:text-primary-gold transition"
                             @click="slideNext"
                         />
                     </div>

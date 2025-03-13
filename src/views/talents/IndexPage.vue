@@ -32,7 +32,7 @@
                         class="w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
                     />
                     <div
-                        class="absolute inset-0 bg-gradient-to-t from-[#E3007A]/80 to-[#7D0043]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        class="absolute inset-0 bg-gradient-to-t from-[#FFD700]/80 to-[#B8860B]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     >
                         <div class="absolute bottom-0 w-full p-4 text-white font-bold">
                             <p class="text-lg">{{ talent.talentContent.frame1.location }}</p>
@@ -40,7 +40,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="text-center mt-4 font-bold text-lg">
+                <div class="text-center mt-4 uppercase">
                     <h3>{{ talent.title }}</h3>
                 </div>
             </router-link>

@@ -1,6 +1,6 @@
 <template>
     <div
-        class="divide-y divide-gray-200 rounded-2xl border shadow-xs relative ring-2 ring-pink-600 border-pink-600 m-auto"
+        class="divide-y divide-gray-200 rounded-2xl border shadow-xs relative ring-2 ring-gold-600 border-gold-600 m-auto"
     >
         <!-- Package header -->
         <div class="p-6 sm:px-8">
@@ -34,7 +34,7 @@
                         viewBox="0 0 24 24"
                         stroke-width="1.5"
                         stroke="currentColor"
-                        class="size-5 text-pink-700"
+                        class="size-5 text-gold-700"
                     >
                         <path
                             stroke-linecap="round"

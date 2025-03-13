@@ -81,11 +81,11 @@ const images = [
         class="flex items-center space-x-10 m-auto w-full justify-between absolute top-1/2 -translate-y-1/2"
     >
         <ArrowLeftIcon
-            class="size-10 cursor-pointer hover:text-primary-pink transition"
+            class="size-10 cursor-pointer hover:text-primary-gold transition"
             @click="slidePrev"
         />
         <ArrowRightIcon
-            class="size-10 cursor-pointer hover:text-primary-pink transition"
+            class="size-10 cursor-pointer hover:text-primary-gold transition"
             @click="slideNext"
         />
     </div>

@@ -144,7 +144,7 @@
         v-if="isLoading"
     >
         <div class="flex justify-center items-center">
-            <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-pink-500"></div>
+            <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-gold-500"></div>
         </div>
     </div>
 </template>

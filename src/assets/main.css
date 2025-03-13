@@ -2,6 +2,7 @@
 @import './fonts/montserrat/stylesheet.css';
 @import './fonts/figtree/stylesheet.css';
 @import './fonts/charmonman/stylesheet.css';
+@import './fonts/lato/stylesheet.css';
 
 .font-figtree {
     font-family: 'Figtree', sans-serif;

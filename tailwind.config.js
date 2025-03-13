@@ -9,7 +9,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                sans: ['Lato', 'ui-sans-serif', 'system-ui', 'sans-serif'],
                 serif: ['Merriweather', 'ui-serif', 'Georgia', 'serif'],
                 mono: ['Fira Code', 'ui-monospace', 'SFMono-Regular', 'monospace'],
             },
@@ -64,8 +64,9 @@ export default {
                     700: '#0a3d6f',
                     800: '#0a3142',
                     900: '#002333',
-                    pink: '#E3007A',
+                    gold: '#E3007A',
                     orange: '#FF9100',
+                    gold: '#e3c265',
                 },
 
                 gray: {
@@ -107,5 +108,5 @@ export default {
             },
         },
     },
-    plugins: [require('@tailwindcss/aspect-ratio')],
+    plugins: [require('@tailwindcss/aspect-ratio'), require('@tailwindcss/forms')],
 };

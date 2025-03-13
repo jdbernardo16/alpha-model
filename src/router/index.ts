@@ -3,6 +3,7 @@ import HomePage from '../views/HomePage.vue';
 import TalentIndex from '../views/talents/IndexPage.vue';
 import TalentView from '../views/talents/ViewPage.vue';
 import CheckoutPage from '../components/CheckoutPage.vue';
+import ApplicationPage from '../views/ApplicationView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +24,23 @@ const router = createRouter({
             name: 'talent-view',
             component: TalentView,
             props: true,
+        },
+        // Blog
+        {
+            path: '/blogs',
+            name: 'blog',
+            component: () => import('../views/blog/IndexPage.vue'),
+        },
+        {
+            path: '/blogs/:slug',
+            name: 'blog-view',
+            component: () => import('../views/blog/ViewPage.vue'),
+            props: true,
+        },
+        {
+            path: '/become-a-talent',
+            name: 'become-a-talent',
+            component: ApplicationPage,
         },
         {
             path: '/about',

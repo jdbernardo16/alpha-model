@@ -7,12 +7,16 @@
                 v-for="(pkg, index) in packages"
                 :key="index"
                 class="divide-y divide-gray-200 rounded-2xl border shadow-xs relative"
-                :class="pkg.featured ? 'ring-2 ring-pink-600 border-pink-600' : 'border-gray-200 '"
+                :class="
+                    pkg.featured
+                        ? 'ring-2 ring-primary-gold border-primary-gold'
+                        : 'border-gray-200 '
+                "
             >
                 <!-- Featured badge if applicable -->
                 <div
                     v-if="pkg.featured"
-                    class="absolute -top-2 -right-2 bg-pink-600 text-white px-3 py-1 text-sm font-medium rounded-bl-md rounded-tr-md"
+                    class="absolute -top-2 -right-2 bg-primary-gold text-white px-3 py-1 text-sm font-medium rounded-bl-md rounded-tr-md"
                 >
                     Recommended
                 </div>
@@ -41,8 +45,8 @@
                                 packageFeatures: JSON.stringify(pkg.features),
                             },
                         }"
-                        class="mt-4 block w-full rounded-sm border border-pink-600 bg-pink-600 px-12 py-3 text-center text-sm font-medium text-white hover:bg-transparent hover:text-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-600 sm:mt-6 transition"
-                        :class="{ 'bg-pink-700': pkg.featured }"
+                        class="mt-4 block w-full rounded-sm border border-primary-gold bg-primary-gold px-12 py-3 text-center text-sm font-medium text-white hover:bg-transparent hover:text-primary-gold focus:outline-none focus:ring-2 focus:ring-primary-gold sm:mt-6 transition"
+                        :class="{ 'bg-gold-700': pkg.featured }"
                     >
                         Get Started
                     </router-link>
@@ -66,7 +70,7 @@
                                 viewBox="0 0 24 24"
                                 stroke-width="1.5"
                                 stroke="currentColor"
-                                class="size-5 text-pink-700"
+                                class="size-5 text-gold-700"
                             >
                                 <path
                                     stroke-linecap="round"
