@@ -140,11 +140,14 @@
                                 v-model="form.country"
                                 class="w-full bg-black/50 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-gold focus:border-transparent appearance-none transition"
                             >
-                                <option value="" disabled>Country</option>
-                                <option value="United States">United States</option>
-                                <option value="Canada">Canada</option>
-                                <option value="UK">United Kingdom</option>
-                                <!-- More countries would be added here -->
+                                <option value="" disabled selected>Country</option>
+                                <option
+                                    v-for="country in countries"
+                                    :key="country"
+                                    :value="country"
+                                >
+                                    {{ country }}
+                                </option>
                             </select>
                         </div>
 
@@ -322,7 +325,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, Ref } from 'vue';
+import { useCountries } from '../composables/useCountries';
+
+const { countries } = useCountries();
 
 interface FormData {
     firstName: string;
@@ -353,7 +359,7 @@ const form = reactive<FormData>({
 });
 
 const selectedFiles = ref<File[]>([]);
-const fileInput = ref<HTMLInputElement | null>(null);
+const fileInput: Ref<HTMLInputElement | null> = ref(null);
 
 const handleFileUpload = (event: Event) => {
     const target = event.target as HTMLInputElement;

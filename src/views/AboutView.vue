@@ -69,31 +69,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Contact CTA -->
-            <div class="mt-24 bg-gray-100 rounded-2xl p-12 text-center">
-                <h2 class="text-3xl font-bold mb-4 text-gray-800">Ready to Work With Us?</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto mb-8">
-                    Whether you're looking for representation or seeking talent for your next
-                    project, we're here to help bring your vision to life.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="/become-a-talent">
-                        <button
-                            class="bg-primary-gold hover:bg-gray-900 text-white py-3 px-8 rounded-full font-medium transition duration-300"
-                        >
-                            Become a Talent
-                        </button>
-                    </a>
-                    <a href="/#contact">
-                        <button
-                            class="bg-white hover:bg-gray-100 text-primary-gold border border-primary-gold py-3 px-8 rounded-full font-medium transition duration-300"
-                        >
-                            Contact Us
-                        </button>
-                    </a>
-                </div>
-            </div>
         </div>
     </div>
 </template>

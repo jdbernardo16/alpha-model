@@ -2,7 +2,7 @@
     <section>
         <div
             v-if="loading"
-            class="max-w-[1440px] m-auto py-10 px-4 lg:px-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-10"
+            class="max-w-[1440px] m-auto py-10 px-4 lg:px-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-10"
         >
             <!-- Skeleton Loader -->
             <div v-for="n in 8" :key="n" class="group">
@@ -16,18 +16,18 @@
         </div>
         <div
             v-else
-            class="max-w-[1440px] m-auto py-10 px-4 lg:px-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-10"
+            class="max-w-[1440px] m-auto py-10 px-4 lg:px-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-10"
         >
             <!-- Model Card -->
             <router-link
-                v-for="talent in talents"
+                v-for="talent in sortedTalents"
                 :key="talent.slug"
                 :to="{ name: 'talent-view', params: { slug: talent.slug } }"
                 class="group"
             >
                 <div class="relative overflow-hidden shadow-lg aspect-w-[300] aspect-h-[400]">
                     <img
-                        :src="talent.talentContent.thumbnail.node.sourceUrl"
+                        :src="talent.talentContent?.thumbnail?.node?.sourceUrl"
                         :alt="talent.title"
                         class="w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
                     />
@@ -35,13 +35,13 @@
                         class="absolute inset-0 bg-gradient-to-t from-[#FFD700]/80 to-[#B8860B]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     >
                         <div class="absolute bottom-0 w-full p-4 text-white font-bold">
-                            <p class="text-lg">{{ talent.talentContent.frame1.location }}</p>
-                            <p class="text-sm">{{ talent.talentContent.frame1.tags }}</p>
+                            <p class="text-lg">{{ talent.talentContent?.frame1?.location }}</p>
+                            <p class="text-sm">{{ talent.talentContent?.frame1?.tags }}</p>
                         </div>
                     </div>
                 </div>
-                <div class="text-center mt-4 uppercase">
-                    <h3>{{ talent.title }}</h3>
+                <div class="text-center mt-3 uppercase text-sm">
+                    <h3 class="tracking-wider">{{ talent.title }}</h3>
                 </div>
             </router-link>
         </div>
@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import type { Talent } from '@/types';
 
@@ -81,6 +81,15 @@ const talents = ref<Talent[] | null>(null);
 const loading = ref(true);
 
 const error = ref<Error | null>(null);
+
+// Computed property to sort talents alphabetically by title
+const sortedTalents = computed(() => {
+    if (talents.value) {
+        return [...talents.value].sort((a, b) => a.title.localeCompare(b.title));
+    }
+    return null;
+});
+
 onMounted(async () => {
     try {
         const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {

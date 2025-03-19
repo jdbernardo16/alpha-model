@@ -84,8 +84,14 @@ export interface FeaturedTalentData {
 
 export interface Talent {
     title: string;
+    slug: string;
     uri: string;
     talentContent?: {
+        thumbnail?: {
+            node: {
+                sourceUrl: string;
+            };
+        };
         frame1?: {
             backgroundImage?: { node: { sourceUrl: string } };
             fullName?: string;

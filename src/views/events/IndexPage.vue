@@ -3,7 +3,6 @@ import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import Accordion from '@/components/general/Accordion.vue';
 import Countdown from '@/components/general/Countdown.vue';
-import { formatDate } from '@/utils/dateFormatter';
 import VueEasyLightbox from 'vue-easy-lightbox';
 import type { PromoEventsData } from '@/types';
 import PricingTable from '@/components/PricingTable.vue';
@@ -109,8 +108,20 @@ onMounted(async () => {
     }
 });
 
-// Add these to your ref declarations
 const currentEventIndex = ref(-1);
+const currentHighlightIndex = ref(-1);
+
+const currentHighlightGallery = computed(() => {
+    if (cms.value?.highlights.highlightGallery.nodes) {
+        return cms.value.highlights.highlightGallery.nodes.map((node) => ({
+            src: node.sourceUrl,
+            srcset: node.srcSet,
+            title: node.altText || 'Highlight Image',
+        }));
+    }
+    return [];
+});
+
 const currentEventGallery = computed(() => {
     if (
         currentEventIndex.value >= 0 &&
@@ -128,6 +139,12 @@ const currentEventGallery = computed(() => {
 // Replace your showImage function with this
 const showImage = (eventIndex: number, imageIndex: number = 0) => {
     currentEventIndex.value = eventIndex;
+    index.value = imageIndex;
+    visible.value = true;
+};
+
+const showHighlightImage = (imageIndex: number) => {
+    currentHighlightIndex.value = imageIndex;
     index.value = imageIndex;
     visible.value = true;
 };
@@ -184,68 +201,6 @@ const onHide = () => {
     <section class="border-b">
         <PricingTable />
     </section>
-    <section>
-        <div class="max-w-[1440px] mx-auto px-4 lg:px-20 py-10 lg:py-20">
-            <div class="mb-20 space-y-4 w-full lg:w-1/2">
-                <p class="font-semibold">{{ cms?.pastEvents.header }}</p>
-                <h2 class="text-4xl font-bold mb-2">{{ cms?.pastEvents.title }}</h2>
-                <p class="mb-8">
-                    {{ cms?.pastEvents.description }}
-                </p>
-            </div>
-
-            <div class="space-y-20 divide-y">
-                <div
-                    v-for="event in cms?.pastEvents.events"
-                    :key="event.date + event.title"
-                    class="flex lg:flex-row flex-col items-center lg:space-x-20 pt-20 first:pt-0"
-                >
-                    <div class="w-full lg:w-1/2 space-y-6 lg:order-1 order-2 lg:mt-0 mt-10">
-                        <p class="text-gray-600">{{ formatDate(event.date) }}</p>
-                        <h3 class="text-xl font-bold mb-2">{{ event.title }}</h3>
-                        <div>
-                            <p class="text-gray-600 mb-2 font-semibold text-sm">
-                                {{ event.subHeader }}
-                            </p>
-                        </div>
-                        <div>
-                            <p class="font-bold mb-2">Details</p>
-                            <p class="text-gray-600" v-html="event.details"></p>
-                        </div>
-                    </div>
-                    <div class="w-full lg:w-1/2 relative lg:order-2 order-1">
-                        <div class="aspect-w-[500] aspect-h-[600] w-full group/item cursor-pointer">
-                            <img
-                                v-if="event.thumbnail?.node"
-                                :src="event.thumbnail.node.sourceUrl"
-                                :srcset="event.thumbnail.node.srcSet"
-                                :alt="event.thumbnail.node.altText"
-                                class="w-full object-cover h-full cursor-pointer"
-                            />
-                            <div
-                                class="absolute w-full h-full bg-black/[0.5] transition group-hover/item:opacity-100 opacity-0 flex items-center justify-center"
-                                @click="
-                                    showImage(
-                                        cms?.pastEvents?.events?.findIndex((e) => e === event) ??
-                                            -1,
-                                        0, // Start with first image in the gallery
-                                    )
-                                "
-                            >
-                                <p class="font-bold text-white">View Gallery</p>
-                            </div>
-                        </div>
-                        <!-- <div
-                            class="absolute top-6 right-6 bg-white flex items-center space-x-2 px-3 py-1 rounded"
-                        >
-                            <MapPinIcon class="w-4 h-4" />
-                            <p class="font-semibold text-sm">New York</p>
-                        </div> -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
     <section class="bg-black w-full">
         <div class="max-w-[1440px] m-auto px-4 lg:px-20 py-10 lg:py-20">
             <div class="text-white text-center max-w-[768px] m-auto space-y-6 mb-20">
@@ -254,16 +209,23 @@ const onHide = () => {
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <template
-                    v-for="highlight in cms?.highlights.highlightGallery.nodes"
+                    v-for="(highlight, index) in cms?.highlights.highlightGallery.nodes"
                     :key="highlight.id"
                 >
-                    <div class="aspect-w-[640] aspect-h-[640]">
+                    <div class="aspect-w-[640] aspect-h-[640] group/item relative">
                         <img
                             :src="highlight.sourceUrl"
                             :srcset="highlight.srcSet"
                             :alt="highlight.altText"
-                            class="w-full h-full object-cover"
+                            class="w-full h-full object-cover cursor-pointer"
+                            @click="showHighlightImage(index)"
                         />
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-primary-gold to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 flex items-end justify-center cursor-pointer"
+                            @click="showHighlightImage(index)"
+                        >
+                            <p class="text-white font-bold pb-10">View Gallery</p>
+                        </div>
                     </div>
                 </template>
             </div>
@@ -299,7 +261,7 @@ const onHide = () => {
 
     <VueEasyLightbox
         :visible="visible"
-        :imgs="currentEventGallery"
+        :imgs="currentHighlightGallery"
         :index="index"
         @hide="onHide"
     ></VueEasyLightbox>
