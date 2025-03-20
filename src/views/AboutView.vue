@@ -1,27 +1,5 @@
 <template>
     <div class="min-h-screen bg-gradient-to-b from-gray-100 to-white">
-        <!-- Hero Section -->
-        <div class="relative h-96 overflow-hidden">
-            <!-- Background Image -->
-            <div
-                class="absolute inset-0 bg-cover bg-top"
-                style="
-                    background-image: url('https://i.pinimg.com/736x/83/62/22/836222b43fa1db97d002d9e62d8c1413.jpg');
-                    filter: brightness(0.85) grayscale(100%);
-                "
-            ></div>
-
-            <!-- Content Overlay -->
-            <div class="absolute inset-0 flex flex-col items-center justify-center p-6">
-                <h1 class="text-5xl font-bold mb-4 text-center text-primary-gold">
-                    Alpha Aesthetics
-                </h1>
-                <p class="text-xl font-light max-w-2xl text-center text-white">
-                    Premier Talent Management in Newport Beach
-                </p>
-            </div>
-        </div>
-
         <!-- Main Content -->
         <div class="max-w-6xl mx-auto px-4 py-16">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">

@@ -19,6 +19,23 @@
                                 class="text-3xl sm:text-5xl font-extralight uppercase mb-6 sm:mb-10 tracking-wider relative"
                             >
                                 ADRIANA IGLESIAS
+                                <div class="space-x-2 flex">
+                                    <p
+                                        class="px-2.5 bg-primary-gold w-fit text-white rounded-full text-sm"
+                                    >
+                                        Model
+                                    </p>
+                                    <p
+                                        class="px-2.5 bg-primary-gold w-fit text-white rounded-full text-sm"
+                                    >
+                                        Dancer
+                                    </p>
+                                    <p
+                                        class="px-2.5 bg-primary-gold w-fit text-white rounded-full text-sm"
+                                    >
+                                        Actress
+                                    </p>
+                                </div>
                                 <div
                                     class="w-12 sm:w-16 h-0.5 bg-black absolute -bottom-2 sm:-bottom-4 left-0"
                                 ></div>
