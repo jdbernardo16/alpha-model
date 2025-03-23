@@ -71,6 +71,7 @@ const GET_PROMO_EVENTS = `
                                 sourceUrl
                                 srcSet
                                 altText
+                                title
                             }
                         }
                     }
@@ -212,20 +213,23 @@ const onHide = () => {
                     v-for="(highlight, index) in cms?.highlights.highlightGallery.nodes"
                     :key="highlight.id"
                 >
-                    <div class="aspect-w-[640] aspect-h-[640] group/item relative">
-                        <img
-                            :src="highlight.sourceUrl"
-                            :srcset="highlight.srcSet"
-                            :alt="highlight.altText"
-                            class="w-full h-full object-cover cursor-pointer"
-                            @click="showHighlightImage(index)"
-                        />
-                        <div
-                            class="absolute inset-0 bg-gradient-to-t from-primary-gold to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 flex items-end justify-center cursor-pointer"
-                            @click="showHighlightImage(index)"
-                        >
-                            <p class="text-white font-bold pb-10">View Gallery</p>
+                    <div>
+                        <div class="aspect-w-[640] aspect-h-[640] group/item relative">
+                            <img
+                                :src="highlight.sourceUrl"
+                                :srcset="highlight.srcSet"
+                                :alt="highlight.altText"
+                                class="w-full h-full object-cover cursor-pointer"
+                                @click="showHighlightImage(index)"
+                            />
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-primary-gold to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 flex items-end justify-center cursor-pointer"
+                                @click="showHighlightImage(index)"
+                            >
+                                <p class="text-white font-bold pb-10">View Gallery</p>
+                            </div>
                         </div>
+                        <p class="text-white text-center mt-2">{{ highlight.title }}</p>
                     </div>
                 </template>
             </div>

@@ -185,6 +185,7 @@ export interface PromoEventsData {
                 sourceUrl: string;
                 srcSet: string;
                 altText: string;
+                title: string;
             }[];
         };
     };
