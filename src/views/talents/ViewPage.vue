@@ -51,6 +51,16 @@ query GetTalentBySlug($slug:ID !) {
                 frame2 {
                     title description
                 }
+                contactDetails {
+                    socialMedia {
+                        icon {
+                            node {
+                                sourceUrl
+                            }
+                        }
+                        link
+                    }
+                }
                 frame3 {
                     title description
                 }
@@ -132,7 +142,7 @@ onMounted(async () => {
                             </h1>
 
                             <div
-                                class="grid grid-cols-5 gap-x-4 sm:gap-x-12 gap-y-4 text-sm tracking-wide mt-6"
+                                class="grid grid-cols-5 gap-x-4 sm:gap-x-12 gap-y-4 text-sm tracking-wide my-6"
                             >
                                 <template v-if="talent.talentContent.frame1.attributes?.height">
                                     <div class="uppercase col-span-1 text-gray-500 font-medium">
@@ -215,6 +225,37 @@ onMounted(async () => {
                                     </div>
                                 </template>
                             </div>
+                            <p class="mb-4 uppercase">
+                                Follow
+                                {{
+                                    talent.talentContent?.frame1?.fullName
+                                        ? talent.talentContent.frame1.fullName.split(' ')[0]
+                                        : 'them'
+                                }}
+                                on social media:
+                            </p>
+                            <div class="flex items-center gap-6">
+                                <a
+                                    v-for="(social, index) in talent.talentContent.contactDetails
+                                        .socialMedia"
+                                    :key="index"
+                                    :href="social.link || '#'"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="text-amber-400 hover:text-amber-300 transition-colors"
+                                >
+                                    <img
+                                        v-if="social.icon?.node?.sourceUrl"
+                                        :src="social.icon.node.sourceUrl"
+                                        :alt="social.icon.node.altText"
+                                        class="h-5 w-5 hover:scale-110 transition"
+                                    />
+                                    <!-- Fallback icon or text if no image -->
+                                    <span v-else class="h-5 w-5 inline-block border rounded"
+                                        >?</span
+                                    >
+                                </a>
+                            </div>
                         </div>
                     </swiper-slide>
                     <swiper-slide
@@ -256,11 +297,10 @@ onMounted(async () => {
                     About {{ talent.talentContent?.frame1?.fullName?.split(' ')[0] || 'Talent' }}
                 </h2>
             </div>
-            <p
-                class="text-gray-700 leading-relaxed text-base sm:text-lg max-w-3xl font-light italic"
-            >
-                {{ talent.talentContent.frame2.description }}
-            </p>
+            <div
+                class="text-gray-700 leading-relaxed text-base sm:text-lg max-w-3xl font-light italic wysiwyg"
+                v-html="talent.talentContent.frame2.description"
+            />
         </div>
 
         <!-- Hire Section with artistic contact presentation -->
@@ -271,16 +311,7 @@ onMounted(async () => {
                     Hire {{ talent.talentContent.frame1.fullName.split(' ')[0] }}
                 </h2>
             </div>
-            <div
-                class="inline-block border-b border-gray-300 pb-1 transition-all duration-300 hover:border-black"
-            >
-                <a
-                    href="mailto:admin@alphatalentmanagement.com"
-                    class="text-gray-800 tracking-wide hover:text-black transition-colors duration-300"
-                >
-                    admin@alphatalentmanagement.com
-                </a>
-            </div>
+            <div class="wysiwyg" v-html="talent.talentContent.frame3.description"></div>
         </div>
 
         <!-- Artistic footer element -->
@@ -297,7 +328,7 @@ onMounted(async () => {
     --swiper-navigation-color: #000;
     --swiper-pagination-color: #000;
     --swiper-pagination-bullet-inactive-color: #ccc;
-    --swiper-navigation-sides-offset: 00px;
+    --swiper-navigation-sides-offset: 50px;
 
     .swiper-button-next,
     .swiper-button-prev {

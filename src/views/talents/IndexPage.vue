@@ -271,7 +271,7 @@ const getHostname = (urlString: string | undefined): string => {
 
                         <div
                             v-if="featuredTalent.talentContent?.frame2?.description"
-                            class="wysiwyg line-clamp-3"
+                            class="wysiwyg mb-6"
                             v-html="featuredTalent.talentContent.frame2.description"
                         />
 
@@ -302,7 +302,7 @@ const getHostname = (urlString: string | undefined): string => {
                                         v-if="social.icon?.node?.sourceUrl"
                                         :src="social.icon.node.sourceUrl"
                                         :alt="getHostname(social.link)"
-                                        class="h-5 w-5"
+                                        class="h-5 w-5 hover:scale-110 transition"
                                     />
                                     <!-- Fallback icon or text if no image -->
                                     <span v-else class="h-5 w-5 inline-block border rounded"

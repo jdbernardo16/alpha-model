@@ -76,7 +76,7 @@
             <!-- Blog Content -->
             <div
                 v-if="post.blog?.blogContent?.content"
-                class="prose prose-lg max-w-none mb-12"
+                class="prose prose-lg max-w-none mb-12 wysiwyg"
                 v-html="post.blog.blogContent.content"
             ></div>
             <div v-else class="mb-12 text-gray-500">Content is not available for this post.</div>
