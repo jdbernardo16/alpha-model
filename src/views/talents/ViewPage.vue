@@ -1,39 +1,129 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import axios from 'axios';
+import type { Talent } from '@/types';
+// Import Swiper Vue.js components
+import { Swiper, SwiperSlide } from 'swiper/vue';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
+// import required modules
+import { Navigation, Pagination } from 'swiper/modules';
+import { register } from 'swiper/element/bundle';
+
+register();
+
+const route = useRoute();
+const slug = route.params.slug as string | undefined;
+
+const talent = ref<Talent | null>(null);
+const loading = ref(true);
+const error = ref<Error | null>(null);
+
+const GET_TALENT_BY_SLUG = `
+query GetTalentBySlug($slug:ID !) {
+    talent(id: $slug, idType:SLUG) {
+        title uri...on WithAcfTalentContent {
+            talentContent {
+                frame1 {
+                    fullName thumbnail {
+                        node {
+                            sourceUrl altText id
+                        }
+                    }
+                    talents {
+                        label
+                    }
+                    images {
+                        nodes {
+                            title sourceUrl srcSet altText
+                        }
+                    }
+                    attributes {
+                        bust cup dress eyes hair height hip shoes waist
+                    }
+                    address
+                }
+                frame2 {
+                    title description
+                }
+                frame3 {
+                    title description
+                }
+            }
+        }
+    }
+}
+`;
+
+onMounted(async () => {
+    if (!slug) {
+        error.value = new Error('Slug is undefined');
+        loading.value = false;
+        return;
+    }
+
+    try {
+        const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
+            query: GET_TALENT_BY_SLUG,
+            variables: { slug },
+        });
+
+        if (response.data.errors) {
+            throw new Error(response.data.errors.map((e: any) => e.message).join(', '));
+        }
+
+        talent.value = response.data.data.talent;
+    } catch (err: any) {
+        error.value = err;
+    } finally {
+        loading.value = false;
+    }
+});
+</script>
+
 <template>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 font-light">
+    <div v-if="loading" class="text-center py-12">Loading...</div>
+    <div v-else-if="error" class="text-center py-12 text-red-500">
+        Error loading talent: {{ error.message }}
+    </div>
+    <div v-else-if="talent" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 font-light">
         <!-- Portfolio Section with artistic presentation -->
         <div class="mb-12 sm:mb-20">
             <!-- Swiper Component with enhanced styling -->
-            <div class="relative">
+            <div v-if="talent.talentContent?.frame1?.images?.nodes?.length" class="relative">
                 <swiper-container
                     :slides-per-view="1"
                     :breakpoints="{
                         640: { slidesPerView: 2, spaceBetween: 25 },
                     }"
-                    :navigation="true"
+                    :navigation="talent.talentContent.frame1.images.nodes.length > 1"
                     :pagination="{ clickable: true }"
                     class="portfolio-slider"
                 >
                     <swiper-slide>
-                        <div class="w-full flex flex-col justify-start relative">
+                        <div
+                            v-if="talent.talentContent?.frame1"
+                            class="w-full flex flex-col justify-start relative"
+                        >
                             <h1
                                 class="text-3xl sm:text-5xl font-extralight uppercase mb-6 sm:mb-10 tracking-wider relative"
                             >
-                                ADRIANA IGLESIAS
-                                <div class="space-x-2 flex">
+                                {{ talent.talentContent.frame1.fullName }}
+                                <div
+                                    v-if="talent.talentContent.frame1.talents?.length"
+                                    class="space-x-2 flex mt-2"
+                                >
                                     <p
+                                        v-for="(t, index) in talent.talentContent.frame1.talents"
+                                        :key="index"
                                         class="px-2.5 bg-primary-gold w-fit text-white rounded-full text-sm"
                                     >
-                                        Model
-                                    </p>
-                                    <p
-                                        class="px-2.5 bg-primary-gold w-fit text-white rounded-full text-sm"
-                                    >
-                                        Dancer
-                                    </p>
-                                    <p
-                                        class="px-2.5 bg-primary-gold w-fit text-white rounded-full text-sm"
-                                    >
-                                        Actress
+                                        {{ t.label }}
                                     </p>
                                 </div>
                                 <div
@@ -42,64 +132,106 @@
                             </h1>
 
                             <div
-                                class="grid grid-cols-5 gap-x-4 sm:gap-x-12 gap-y-4 text-sm tracking-wide"
+                                class="grid grid-cols-5 gap-x-4 sm:gap-x-12 gap-y-4 text-sm tracking-wide mt-6"
                             >
-                                <div class="uppercase col-span-1 text-gray-500 font-medium">
-                                    HEIGHT
-                                </div>
-                                <div class="col-span-4 border-b border-gray-100 pb-2">5' 10"</div>
+                                <template v-if="talent.talentContent.frame1.attributes?.height">
+                                    <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                        HEIGHT
+                                    </div>
+                                    <div class="col-span-4 border-b border-gray-100 pb-2">
+                                        {{ talent.talentContent.frame1.attributes.height }}
+                                    </div>
+                                </template>
 
-                                <div class="uppercase col-span-1 text-gray-500 font-medium">
-                                    BUST
-                                </div>
-                                <div class="col-span-4 border-b border-gray-100 pb-2">32"</div>
+                                <template v-if="talent.talentContent.frame1.attributes?.bust">
+                                    <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                        BUST
+                                    </div>
+                                    <div class="col-span-4 border-b border-gray-100 pb-2">
+                                        {{ talent.talentContent.frame1.attributes.bust }}
+                                    </div>
+                                </template>
 
-                                <div class="uppercase col-span-1 text-gray-500 font-medium">
-                                    WAIST
-                                </div>
-                                <div class="col-span-4 border-b border-gray-100 pb-2">24"</div>
+                                <template v-if="talent.talentContent.frame1.attributes?.waist">
+                                    <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                        WAIST
+                                    </div>
+                                    <div class="col-span-4 border-b border-gray-100 pb-2">
+                                        {{ talent.talentContent.frame1.attributes.waist }}
+                                    </div>
+                                </template>
 
-                                <div class="uppercase col-span-1 text-gray-500 font-medium">
-                                    HIP
-                                </div>
-                                <div class="col-span-4 border-b border-gray-100 pb-2">34"</div>
+                                <template v-if="talent.talentContent.frame1.attributes?.hip">
+                                    <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                        HIP
+                                    </div>
+                                    <div class="col-span-4 border-b border-gray-100 pb-2">
+                                        {{ talent.talentContent.frame1.attributes.hip }}
+                                    </div>
+                                </template>
 
-                                <div class="uppercase col-span-1 text-gray-500 font-medium">
-                                    SHOE
-                                </div>
-                                <div class="col-span-4 border-b border-gray-100 pb-2">10</div>
+                                <template v-if="talent.talentContent.frame1.attributes?.shoes">
+                                    <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                        SHOE
+                                    </div>
+                                    <div class="col-span-4 border-b border-gray-100 pb-2">
+                                        {{ talent.talentContent.frame1.attributes.shoes }}
+                                    </div>
+                                </template>
 
-                                <div class="uppercase col-span-1 text-gray-500 font-medium">
-                                    DRESS
-                                </div>
-                                <div class="col-span-4 border-b border-gray-100 pb-2">
-                                    2-4 US / 6-8 UK / 34-36 EU
-                                </div>
+                                <template v-if="talent.talentContent.frame1.attributes?.dress">
+                                    <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                        DRESS
+                                    </div>
+                                    <div class="col-span-4 border-b border-gray-100 pb-2">
+                                        {{ talent.talentContent.frame1.attributes.dress }}
+                                    </div>
+                                </template>
 
-                                <div class="uppercase col-span-1 text-gray-500 font-medium">
-                                    CUP
-                                </div>
-                                <div class="col-span-4 border-b border-gray-100 pb-2">A</div>
+                                <template v-if="talent.talentContent.frame1.attributes?.cup">
+                                    <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                        CUP
+                                    </div>
+                                    <div class="col-span-4 border-b border-gray-100 pb-2">
+                                        {{ talent.talentContent.frame1.attributes.cup }}
+                                    </div>
+                                </template>
 
-                                <div class="uppercase col-span-1 text-gray-500 font-medium">
-                                    HAIR
-                                </div>
-                                <div class="col-span-4 border-b border-gray-100 pb-2">BROWN</div>
+                                <template v-if="talent.talentContent.frame1.attributes?.hair">
+                                    <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                        HAIR
+                                    </div>
+                                    <div class="col-span-4 border-b border-gray-100 pb-2">
+                                        {{ talent.talentContent.frame1.attributes.hair }}
+                                    </div>
+                                </template>
 
-                                <div class="uppercase col-span-1 text-gray-500 font-medium">
-                                    EYES
-                                </div>
-                                <div class="col-span-4 border-b border-gray-100 pb-2">BLUE</div>
+                                <template v-if="talent.talentContent.frame1.attributes?.eyes">
+                                    <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                        EYES
+                                    </div>
+                                    <div class="col-span-4 border-b border-gray-100 pb-2">
+                                        {{ talent.talentContent.frame1.attributes.eyes }}
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </swiper-slide>
-                    <swiper-slide v-for="(image, index) in portfolioImages" :key="index">
+                    <swiper-slide
+                        v-for="(image, index) in talent.talentContent.frame1.images.nodes"
+                        :key="index"
+                    >
                         <div
                             class="aspect-w-[3] aspect-h-[4] w-full group relative overflow-hidden"
                         >
                             <img
-                                :src="image"
-                                alt="Portfolio Image"
+                                :src="image.sourceUrl"
+                                :alt="
+                                    image.altText ||
+                                    talent.talentContent.frame1.fullName +
+                                        ' portfolio image ' +
+                                        (index + 1)
+                                "
                                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                             />
                             <div
@@ -108,7 +240,7 @@
                             <div
                                 class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 text-white text-xs sm:text-sm tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                             >
-                                PORTFOLIO.{{ index + 1 }}
+                                {{ image.title || `PORTFOLIO.${index + 1}` }}
                             </div>
                         </div>
                     </swiper-slide>
@@ -117,29 +249,26 @@
         </div>
 
         <!-- About Talent Section with artistic typography -->
-        <div class="mb-12 sm:mb-16">
+        <div v-if="talent.talentContent?.frame2?.description" class="mb-12 sm:mb-16">
             <div class="flex items-center mb-6 sm:mb-8">
                 <div class="w-10 sm:w-12 h-px bg-black mr-4"></div>
                 <h2 class="text-xl sm:text-2xl font-extralight uppercase tracking-widest">
-                    About Talent
+                    About {{ talent.talentContent?.frame1?.fullName?.split(' ')[0] || 'Talent' }}
                 </h2>
             </div>
             <p
                 class="text-gray-700 leading-relaxed text-base sm:text-lg max-w-3xl font-light italic"
             >
-                ADRIANA is a talented actor, model, and dancer based in Los Angeles. He has starred
-                in films, appeared in music videos, and has extensive experience in both musical and
-                theatrical productions. Over the years, he has worked with numerous well-known
-                brands, showcasing his versatility and dedication to the industry.
+                {{ talent.talentContent.frame2.description }}
             </p>
         </div>
 
         <!-- Hire Section with artistic contact presentation -->
-        <div class="mb-10 sm:mb-12">
+        <div v-if="talent.talentContent?.frame1?.fullName" class="mb-10 sm:mb-12">
             <div class="flex items-center mb-6 sm:mb-8">
                 <div class="w-10 sm:w-12 h-px bg-black mr-4"></div>
                 <h2 class="text-xl sm:text-2xl font-extralight uppercase tracking-widest">
-                    Hire Adriana
+                    Hire {{ talent.talentContent.frame1.fullName.split(' ')[0] }}
                 </h2>
             </div>
             <div
@@ -160,32 +289,6 @@
         </div>
     </div>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue';
-// Import Swiper Vue.js components
-import { Swiper, SwiperSlide } from 'swiper/vue';
-
-// Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-
-// import required modules
-import { Navigation, Pagination } from 'swiper/modules';
-import { register } from 'swiper/element/bundle';
-
-register();
-
-// Portfolio images array using local images
-const portfolioImages = ref([
-    '/images/adriana1.jpg',
-    '/images/adriana2.jpg',
-    '/images/adriana3.jpg',
-    '/images/adriana4.jpg',
-    '/images/adriana5.jpg',
-]);
-</script>
 
 <style lang="scss">
 .portfolio-slider {

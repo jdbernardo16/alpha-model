@@ -4,29 +4,25 @@ import { Navigation, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/autoplay';
-import type { space } from 'postcss/lib/list';
 
 const modules = [Navigation, Autoplay];
 
-// Placeholder data - replace with actual news data
-const items = [
-    { sourceUrl: '/images/news1.jpg', altText: 'News 1', title: 'Jacqueline x Basic.Space' },
-    { sourceUrl: '/images/news2.jpg', altText: 'News 2', title: 'LUCAS x Man of Metropolis' },
-    { sourceUrl: '/images/news3.jpg', altText: 'News 3', title: 'Nyayop x Merit' },
-    { sourceUrl: '/images/news4.jpg', altText: 'News 4', title: 'ESSENCE x RHODE' },
-    { sourceUrl: '/images/news1.jpg', altText: 'News 1', title: 'SIENNA x ELLE ITALIA' },
-    { sourceUrl: '/images/news2.jpg', altText: 'News 2', title: 'Bethany x d la Repubblica' },
-];
+import type { Post } from '../../types'; // Import the Post type
 
-defineProps<{
-    items?: { sourceUrl: string; altText: string }[];
+const props = defineProps<{
+    posts?: Post[]; // Use the Post type for the prop
+    cms?: {
+        header?: string; // Make header optional if not always present
+        title: string;
+        description?: string; // Make description optional
+    };
 }>();
 </script>
 <template>
     <section>
         <div class="max-w-[1440px] px-4 lg:px-20 py-10 m-auto">
             <div class="max-w-[531px] mb-10 text-center m-auto">
-                <h2 class="text-2xl font-serif mb-6">News</h2>
+                <h2 class="text-2xl font-serif mb-6">{{ cms?.title }}</h2>
             </div>
             <swiper
                 :modules="modules"
@@ -50,17 +46,34 @@ defineProps<{
                 }"
                 class="mySwiper"
             >
-                <swiper-slide v-for="(item, index) in items" :key="index">
-                    <div class="w-full">
-                        <div class="aspect-w-[340] aspect-h-[440] mb-4">
-                            <img
-                                :src="item.sourceUrl"
-                                :alt="item.altText"
-                                class="w-full h-full object-cover"
-                            />
+                <!-- Iterate over the posts prop -->
+                <swiper-slide v-for="post in props.posts" :key="post.slug">
+                    <a :href="`/blogs/${post.slug}`">
+                        <div class="w-full">
+                            <div class="aspect-w-[340] aspect-h-[440] mb-4">
+                                <!-- Bind to the correct data structure from the Post type -->
+                                <img
+                                    v-if="post.blog?.blogContent?.thumbnail?.node"
+                                    :src="post.blog.blogContent.thumbnail.node.sourceUrl"
+                                    :alt="
+                                        post.blog.blogContent.thumbnail.node.altText || post.title
+                                    "
+                                    class="w-full h-full object-cover"
+                                />
+                                <!-- Optional: Add a placeholder if image is missing -->
+                                <div
+                                    v-else
+                                    class="w-full h-full bg-gray-200 flex items-center justify-center"
+                                >
+                                    <span>No Image</span>
+                                </div>
+                            </div>
+                            <!-- Use the nested title if available, otherwise fallback to the main post title -->
+                            <p class="text-center line-clamp-2">
+                                {{ post.blog?.blogContent?.title || post.title }}
+                            </p>
                         </div>
-                        <p class="text-center line-clamp-2">{{ item.title }}</p>
-                    </div>
+                    </a>
                 </swiper-slide>
             </swiper>
         </div>

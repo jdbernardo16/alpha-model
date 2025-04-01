@@ -1,13 +1,25 @@
+<script lang="ts" setup>
+interface IProps {
+    cms?: {
+        title: string;
+        description: string;
+        buttonText: string;
+        buttonLink: string;
+    };
+}
+defineProps<IProps>();
+</script>
 <template>
     <section>
         <div id="contact" class="-translate-y-[80px]"></div>
         <div class="mx-auto max-w-[1440px] px-4 py-16 sm:px-20 lg:px-8">
             <div class="mx-auto max-w-2xl text-center">
                 <h1 class="text-2xl font-bold sm:text-3xl">
-                    LOOKING FOR TALENT FOR YOUR NEXT PROJECT?
+                    {{ cms?.title }}
                 </h1>
 
-                <p class="mt-4 text-gray-500">
+                <div class="mt-4 text-gray-500 wysiwyg" v-html="cms?.description" />
+                <!-- <p class="mt-4 text-gray-500" v-html="cms?.description"></p>
                     Fill out the form below with your project details or email
                     <a
                         href="mailto:admin@alphatalentmanagement.com"
@@ -19,7 +31,7 @@
                     and we’ll connect you with the right talent! <br /><br />First Name, Last Name,
                     Phone, Details about the project, description of talent needed, location of
                     shoot and shoot date
-                </p>
+                </p> -->
             </div>
 
             <form action="#" class="mx-auto mt-8 mb-0 max-w-2xl">

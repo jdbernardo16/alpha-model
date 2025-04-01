@@ -12,6 +12,20 @@ const route = useRoute();
 const scrollToContact = () => {
     document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
 };
+
+interface IProps {
+    cms?: {
+        logo?: {
+            // Make logo optional
+            node: {
+                id: string;
+                sourceUrl: string;
+                altText?: string; // Make altText optional
+            };
+        };
+    };
+}
+defineProps<IProps>();
 </script>
 <template>
     <header
@@ -20,8 +34,11 @@ const scrollToContact = () => {
         <div class="m-auto px-4 lg:px-10 flex items-center py-5 justify-between">
             <div class="lg:flex items-center lg:space-x-14">
                 <a class="block" href="/">
-                    <div class="w-[50px] lg:w-[85px] relative z-[1]">
-                        <img src="/images/AATM_logo.png" alt="UAT Logo" class="w-full" />
+                    <div
+                        v-if="cms?.logo?.node?.sourceUrl"
+                        class="w-[50px] lg:w-[85px] relative z-[1]"
+                    >
+                        <img :src="cms?.logo?.node?.sourceUrl" alt="UAT Logo" class="w-full" />
                     </div>
                 </a>
                 <div

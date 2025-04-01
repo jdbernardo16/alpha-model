@@ -109,7 +109,6 @@ onMounted(async () => {
     }
 });
 
-const currentEventIndex = ref(-1);
 const currentHighlightIndex = ref(-1);
 
 const currentHighlightGallery = computed(() => {
@@ -122,27 +121,6 @@ const currentHighlightGallery = computed(() => {
     }
     return [];
 });
-
-const currentEventGallery = computed(() => {
-    if (
-        currentEventIndex.value >= 0 &&
-        cms.value?.pastEvents.events[currentEventIndex.value]?.gallery?.nodes
-    ) {
-        return cms.value.pastEvents.events[currentEventIndex.value].gallery.nodes.map((node) => ({
-            src: node.sourceUrl,
-            srcset: node.srcSet,
-            title: node.altText || 'Event Image',
-        }));
-    }
-    return [];
-});
-
-// Replace your showImage function with this
-const showImage = (eventIndex: number, imageIndex: number = 0) => {
-    currentEventIndex.value = eventIndex;
-    index.value = imageIndex;
-    visible.value = true;
-};
 
 const showHighlightImage = (imageIndex: number) => {
     currentHighlightIndex.value = imageIndex;
@@ -243,7 +221,7 @@ const onHide = () => {
                     <p class="mb-8">
                         {{ cms?.faqs.description }}
                     </p>
-                    <a href="#" class="block">
+                    <a href="/#contact" class="block">
                         <Button
                             class="uppercase font-bold bg-primary-gold px-5 py-3 flex items-center space-x-5 hover:bg-opacity-80 transition rounded-lg text-white"
                         >

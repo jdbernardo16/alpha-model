@@ -5,28 +5,15 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/effect-fade';
 
-const banner = [
-    {
-        src: 'images/banner5.jpg',
-        alt: 'Banner 5',
-    },
-    {
-        src: 'images/banner1.jpg',
-        alt: 'Banner 1',
-    },
-    {
-        src: 'images/banner2.jpg',
-        alt: 'Banner 2',
-    },
-    {
-        src: 'images/banner3.jpg',
-        alt: 'Banner 3',
-    },
-    {
-        src: 'images/banner4.jpg',
-        alt: 'Banner 4',
-    },
-];
+interface IProps {
+    banner: Array<{
+        id: string;
+        sourceUrl: string;
+        srcSet: string;
+        altText: string;
+    }>;
+}
+defineProps<IProps>();
 </script>
 <template>
     <div class="relative">
@@ -46,9 +33,9 @@ const banner = [
             :effect="'fade'"
             class="mySwiper"
         >
-            <swiper-slide v-for="i in banner" :key="i.src">
+            <swiper-slide v-for="i in banner" :key="i.id">
                 <div class="aspect-w-[1425] aspect-h-[891] w-full">
-                    <img class="w-full h-full object-cover" :src="i.src" :alt="i.alt" />
+                    <img class="w-full h-full object-cover" :src="i.sourceUrl" :alt="i.altText" />
                 </div>
             </swiper-slide>
         </swiper>

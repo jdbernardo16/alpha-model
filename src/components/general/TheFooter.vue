@@ -1,102 +1,79 @@
+<script setup lang="ts">
+import type { Footer } from '@/types'; // Assuming you have a types file defining the Footer structure
+
+defineProps<{
+    cms: Footer | null | undefined;
+}>();
+</script>
+
 <template>
-    <!-- <footer class="bg-black w-full relative text-white">
-        <img src="/images/overlay.png" alt="overlay" class="absolute top-0 left-0 w-full h-full" />
-        <div class="max-w-[1440px] m-auto px-4 lg:px-10">
-            <div
-                class="w-full relative z-[1] flex lg:flex-row flex-col lg:space-y-0 space-y-10 justify-between border-b border-neutral-500 py-10 lg:py-16"
-            >
-                <div class="space-y-2.5">
-                    <img src="/images/AATM_logo.png" alt="logo" class="w-20" />
-                    <div class="space-y-2.5">
-                        <p>Address: 3 Green St, UK, W1K 6RN, GB</p>
-                        <p>Contact: +123 4567 890</p>
-                        <p>Email Address: alpha@example.com</p>
-                    </div>
-                </div>
-
-                <div class="flex lg:flex-row flex-col lg:space-y-0 space-y-10 lg:space-x-10">
-                    <div>
-                        <p class="font-bold mb-2.5">Information</p>
-                        <div class="space-y-2.5 flex flex-col">
-                            <a href="#" class="text-sm">Promo Events</a>
-                            <a href="#" class="text-sm">Contact Us</a>
-                            <a href="#" class="text-sm">About Us</a>
-                            <a href="#" class="text-sm">Models</a>
-                            <a href="#" class="text-sm">Blogs</a>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="font-bold mb-2.5">Legal</p>
-                        <div class="space-y-2.5 flex flex-col">
-                            <a href="#" class="text-sm">Privacy Policy</a>
-                            <a href="#" class="text-sm">Terms and Conditions</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex space-x-5">
-                    <a href="">
-                        <img src="/images/facebook.svg" alt="facebook" />
-                    </a>
-                    <a href="">
-                        <img src="/images/instagram.svg" alt="instagram" />
-                    </a>
-                    <a href="">
-                        <img src="/images/twitter.svg" alt="twitter" />
-                    </a>
-                    <a href="">
-                        <img src="/images/yt.svg" alt="youtube" />
-                    </a>
-                </div>
-            </div>
-            <div class="text-center py-5 text-xs">
-                <p>© 2025. All Right Reserved. Alpha Aesthetic</p>
-            </div>
-        </div>
-    </footer> -->
-    <footer class="bg-black">
+    <footer v-if="cms" class="bg-black">
         <div class="max-w-[1440px] m-auto px-4 lg:px-10 text-white py-10 space-y-10">
             <div
                 class="flex items-center uppercase space-x-4 m-auto w-fit lg:flex-row flex-col lg:space-y-0 space-y-4 lg:text-left text-center"
             >
                 <a
+                    v-if="cms.address"
                     class="transition hover:text-primary-gold"
-                    href="https://maps.app.goo.gl/PJJ6VAZRRrbbmFpY8"
+                    :href="`https://maps.google.com/?q=${encodeURIComponent(cms.address)}`"
                     target="_blank"
                     rel="noreferrer"
-                    >3857 Birch St, Ste 545 Newport Beach, CA 92660-2616</a
+                    >{{ cms.address }}</a
                 >
-                <span>•</span>
+                <span v-if="cms.address && cms.contactNumber">•</span>
                 <a
+                    v-if="cms.contactNumber"
                     class="transition hover:text-primary-gold"
-                    href="tel:+19495767566"
+                    :href="`tel:${cms.contactNumber.replace(/\s+/g, '')}`"
                     target="_blank"
                     rel="noreferrer"
-                    >+1 949-576-7566</a
+                    >{{ cms.contactNumber }}</a
                 >
-                <span>•</span>
+                <span v-if="cms.contactNumber && cms.email">•</span>
                 <a
+                    v-if="cms.email"
                     class="transition hover:text-primary-gold"
-                    href="mailto:admin@alphatalentmanagement.com"
+                    :href="`mailto:${cms.email}`"
                     target="_blank"
                     rel="noreferrer"
-                    >admin@alphatalentmanagement.com</a
+                    >{{ cms.email }}</a
                 >
             </div>
-            <div class="flex space-x-5 w-fit m-auto">
-                <a href="">
-                    <img src="/images/facebook.svg" alt="facebook" />
-                </a>
-                <a href="">
-                    <img src="/images/instagram.svg" alt="instagram" />
-                </a>
-                <a href="">
-                    <img src="/images/twitter.svg" alt="twitter" />
+            <div
+                v-if="cms.socialMedia && cms.socialMedia.length > 0"
+                class="flex space-x-5 w-fit m-auto"
+            >
+                <a
+                    v-for="social in cms.socialMedia"
+                    :key="social.icon?.node?.id || social.link"
+                    :href="social.link"
+                    target="_blank"
+                    rel="noreferrer"
+                    class="transition hover:opacity-75"
+                >
+                    <img
+                        v-if="social.icon?.node?.sourceUrl"
+                        :src="social.icon.node.sourceUrl"
+                        :alt="social.icon.node.altText || 'Social Media Icon'"
+                        class="h-6 w-6 object-contain"
+                    />
                 </a>
             </div>
-            <p class="text-center text-sm">
-                © 2025 Alpha Aesthetics Talent Management. All Rights Reserved.
+            <p v-if="cms.footerCopyright" class="text-center text-sm">
+                {{ cms.footerCopyright }}
             </p>
+        </div>
+    </footer>
+    <!-- Fallback or loading state if needed -->
+    <footer v-else class="bg-black">
+        <div class="max-w-[1440px] m-auto px-4 lg:px-10 text-white py-10 space-y-10 animate-pulse">
+            <div class="h-4 bg-gray-700 rounded w-3/4 mx-auto"></div>
+            <div class="flex space-x-5 w-fit m-auto">
+                <div class="h-6 w-6 bg-gray-700 rounded"></div>
+                <div class="h-6 w-6 bg-gray-700 rounded"></div>
+                <div class="h-6 w-6 bg-gray-700 rounded"></div>
+            </div>
+            <div class="h-3 bg-gray-700 rounded w-1/2 mx-auto"></div>
         </div>
     </footer>
 </template>
