@@ -92,6 +92,18 @@ export interface Talent {
             title?: string;
             description?: string;
         };
+        // Add contactDetails based on the query in ViewPage.vue
+        contactDetails?: {
+            socialMedia?: {
+                icon?: {
+                    node: {
+                        sourceUrl: string;
+                        altText?: string; // Add altText based on template usage
+                    };
+                };
+                link?: string;
+            }[];
+        };
     };
 }
 

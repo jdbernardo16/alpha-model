@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue'; // Import watch
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import type { Talent } from '@/types';
@@ -70,30 +70,99 @@ query GetTalentBySlug($slug:ID !) {
 }
 `;
 
-onMounted(async () => {
-    if (!slug) {
-        error.value = new Error('Slug is undefined');
+// Function to load/fetch data based on slug
+const loadTalentData = (currentSlug: string | undefined) => {
+    if (!currentSlug) {
+        error.value = new Error('Talent slug is missing or invalid.');
         loading.value = false;
+        talent.value = null;
         return;
     }
 
+    // Reset state for the current slug
+    loading.value = true;
+    error.value = null;
+    talent.value = null; // Clear previous talent data
+
+    const storageKey = `talentData_${currentSlug}`;
+
+    // --- Check Cache ---
     try {
-        const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
-            query: GET_TALENT_BY_SLUG,
-            variables: { slug },
-        });
-
-        if (response.data.errors) {
-            throw new Error(response.data.errors.map((e: any) => e.message).join(', '));
+        const cachedData = localStorage.getItem(storageKey);
+        if (cachedData) {
+            talent.value = JSON.parse(cachedData);
+            loading.value = false; // Data from cache, not loading initially
+            console.log(`Loaded talent ${currentSlug} from cache.`);
+        } else {
+            loading.value = true; // No cache, initial load state
         }
-
-        talent.value = response.data.data.talent;
-    } catch (err: any) {
-        error.value = err;
-    } finally {
-        loading.value = false;
+    } catch (e) {
+        console.error(`Failed to parse cached data for ${currentSlug}:`, e);
+        localStorage.removeItem(storageKey); // Clear potentially corrupted cache
+        loading.value = true; // Force loading state if cache fails
     }
+
+    // --- Fetch Data (Stale-While-Revalidate) ---
+    const fetchTalentBySlug = async () => {
+        const initialLoad = loading.value; // Check if this is the very first load (no cache)
+        try {
+            const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
+                query: GET_TALENT_BY_SLUG,
+                variables: { slug: currentSlug }, // Use the passed slug
+            });
+
+            if (response.data.errors) {
+                // Combine GraphQL errors into a single Error object
+                throw new Error(response.data.errors.map((e: any) => e.message).join(', '));
+            }
+
+            const freshData = response.data.data.talent;
+
+            if (freshData) {
+                talent.value = freshData; // Update the view
+                // Update cache
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify(freshData));
+                    console.log(`Updated cache for talent ${currentSlug}.`);
+                } catch (e) {
+                    console.error(`Failed to cache data for ${currentSlug}:`, e);
+                }
+                error.value = null; // Clear previous errors on success
+            } else {
+                // Handle case where talent is not found by slug
+                throw new Error(`Talent with slug "${currentSlug}" not found.`);
+            }
+        } catch (err: any) {
+            console.error(`Error fetching talent ${currentSlug}:`, err);
+            error.value = err;
+            // Keep potentially stale talent.value if loaded from cache
+        } finally {
+            // Only set loading to false if it was the initial load (no cache)
+            if (initialLoad) {
+                loading.value = false;
+            }
+        }
+    };
+
+    // Trigger the fetch in the background
+    fetchTalentBySlug();
+};
+
+// Initial load on mount
+onMounted(() => {
+    loadTalentData(route.params.slug as string | undefined);
 });
+
+// Watch for route slug changes
+watch(
+    () => route.params.slug,
+    (newSlug, oldSlug) => {
+        if (newSlug !== oldSlug) {
+            console.log(`Talent slug changed from ${oldSlug} to ${newSlug}. Reloading data.`);
+            loadTalentData(newSlug as string | undefined);
+        }
+    },
+);
 </script>
 
 <template>
@@ -236,8 +305,8 @@ onMounted(async () => {
                             </p>
                             <div class="flex items-center gap-6">
                                 <a
-                                    v-for="(social, index) in talent.talentContent.contactDetails
-                                        .socialMedia"
+                                    v-for="(social, index) in talent.talentContent?.contactDetails
+                                        ?.socialMedia"
                                     :key="index"
                                     :href="social.link || '#'"
                                     target="_blank"
@@ -246,8 +315,8 @@ onMounted(async () => {
                                 >
                                     <img
                                         v-if="social.icon?.node?.sourceUrl"
-                                        :src="social.icon.node.sourceUrl"
-                                        :alt="social.icon.node.altText"
+                                        :src="social.icon?.node?.sourceUrl"
+                                        :alt="social.icon?.node?.altText || 'Social Media Icon'"
                                         class="h-5 w-5 hover:scale-110 transition"
                                     />
                                     <!-- Fallback icon or text if no image -->
@@ -311,7 +380,7 @@ onMounted(async () => {
                     Hire {{ talent.talentContent.frame1.fullName.split(' ')[0] }}
                 </h2>
             </div>
-            <div class="wysiwyg" v-html="talent.talentContent.frame3.description"></div>
+            <div class="wysiwyg" v-html="talent.talentContent?.frame3?.description"></div>
         </div>
 
         <!-- Artistic footer element -->

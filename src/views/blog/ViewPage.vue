@@ -179,38 +179,99 @@ const GET_BLOG_BY_SLUG = `
     }
 `;
 
-const fetchPost = async (currentSlug: string) => {
-    if (!currentSlug) return; // Don't fetch if slug is not available
+const fetchPost = (currentSlug: string) => {
+    if (!currentSlug) {
+        error.value = new Error('Blog slug is missing or invalid.');
+        loading.value = false;
+        post.value = null;
+        return;
+    }
 
+    // Reset state for the current slug
     loading.value = true;
     error.value = null;
-    post.value = null; // Reset post data before fetching
+    post.value = null; // Clear previous post data
 
+    const storageKey = `blogData_${currentSlug}`;
+
+    // --- Check Cache ---
     try {
-        const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
-            query: GET_BLOG_BY_SLUG,
-            variables: { slug: currentSlug },
-        });
-
-        if (response.data.data?.post) {
-            // Check if the post has the necessary blog content
-            if (response.data.data.post.blog?.blogContent) {
-                post.value = response.data.data.post;
-            } else {
-                console.warn('Post found, but missing ACF blog data:', response.data.data.post);
-                // Treat as not found or handle differently if needed
-                error.value = new Error('Post data is incomplete.');
-            }
+        const cachedData = localStorage.getItem(storageKey);
+        if (cachedData) {
+            post.value = JSON.parse(cachedData);
+            loading.value = false; // Data from cache, not loading initially
+            console.log(`Loaded blog post ${currentSlug} from cache.`);
         } else {
-            console.warn('Post not found or unexpected data structure:', response.data);
-            error.value = new Error('Post not found.'); // Set specific error
+            loading.value = true; // No cache, initial load state
         }
-    } catch (err) {
-        console.error('Error fetching post:', err);
-        error.value = err as Error;
-    } finally {
-        loading.value = false;
+    } catch (e) {
+        console.error(`Failed to parse cached blog data for ${currentSlug}:`, e);
+        localStorage.removeItem(storageKey); // Clear potentially corrupted cache
+        loading.value = true; // Force loading state if cache fails
     }
+
+    // --- Fetch Data (Stale-While-Revalidate) ---
+    const fetchAndCachePost = async () => {
+        const initialLoad = loading.value; // Check if this is the very first load (no cache)
+        try {
+            const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
+                query: GET_BLOG_BY_SLUG,
+                variables: { slug: currentSlug },
+            });
+
+            const freshData = response.data.data?.post;
+
+            if (freshData?.blog?.blogContent) {
+                post.value = freshData; // Update the view
+                // Update cache
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify(freshData));
+                    console.log(`Updated cache for blog post ${currentSlug}.`);
+                } catch (e) {
+                    console.error(`Failed to cache blog data for ${currentSlug}:`, e);
+                }
+                error.value = null; // Clear previous errors on success
+            } else if (freshData) {
+                // Post exists but lacks content
+                console.warn('Post found, but missing ACF blog data:', freshData);
+                error.value = new Error('Post data is incomplete.');
+                // Keep stale cache if it exists, otherwise show error
+                if (!initialLoad) post.value = null; // Clear view if no cache existed
+            } else {
+                // Post not found by slug
+                console.warn('Post not found or unexpected data structure:', response.data);
+                error.value = new Error('Post not found.');
+                // Keep stale cache if it exists, otherwise show error
+                if (!initialLoad) post.value = null; // Clear view if no cache existed
+            }
+
+            // Handle GraphQL errors specifically if they exist
+            if (response.data.errors) {
+                console.error('GraphQL errors fetching post:', response.data.errors);
+                // Potentially override previous error if needed
+                if (!error.value) {
+                    error.value = new Error(
+                        response.data.errors.map((e: any) => e.message).join(', '),
+                    );
+                }
+            }
+        } catch (err: any) {
+            console.error(`Error fetching blog post ${currentSlug}:`, err);
+            if (!error.value) {
+                // Don't overwrite more specific errors from above
+                error.value = err;
+            }
+            // Keep potentially stale post.value if loaded from cache
+        } finally {
+            // Only set loading to false if it was the initial load (no cache)
+            if (initialLoad) {
+                loading.value = false;
+            }
+        }
+    };
+
+    // Trigger the fetch in the background
+    fetchAndCachePost();
 };
 
 // Fetch post when component mounts

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useStorage } from '@vueuse/core';
 import axios from 'axios';
 import type { HomePageData, Post } from '../types';
 import HeroBanner from '../components/slider/HeroBanner.vue';
@@ -74,66 +75,81 @@ const GET_LATEST_BLOGS = `
     }
 `;
 
-const cms = ref<HomePageData | null>(null);
-const latestPosts = ref<Post[]>([]); // Ref for blog posts
+const cms = useStorage<HomePageData | null>('homePageData', null);
+const latestPosts = useStorage<Post[]>('homeLatestPosts', []); // Use storage for posts
 const loading = ref(true); // Combined loading state for simplicity
 const error = ref<Error | null>(null); // Combined error state
 
-onMounted(async () => {
-    loading.value = true;
-    error.value = null;
-    try {
-        const [homeResponse, blogResponse] = await Promise.all([
-            axios.post('https://admin.alphatalentmanagement.com/graphql', { query: GET_HOME }),
-            axios.post('https://admin.alphatalentmanagement.com/graphql', {
-                query: GET_LATEST_BLOGS,
-            }),
-        ]);
-
-        // Log the raw homepage response for debugging
-        console.log('Raw homeResponse:', JSON.stringify(homeResponse.data, null, 2));
-
-        // Check for GraphQL errors specifically for the homepage query
-        if (homeResponse.data.errors) {
-            console.error('GraphQL errors in homeResponse:', homeResponse.data.errors);
-            // Optionally set the main error ref if needed
-            // error.value = new Error('Failed to fetch homepage data.');
-        }
-
-        // Process homepage data
-        if (homeResponse.data.data?.page?.homepage) {
-            cms.value = homeResponse.data.data.page.homepage as HomePageData;
-            console.log('Processed cms data:', JSON.stringify(cms.value, null, 2));
-        } else {
-            console.warn(
-                'Homepage data object (`page.homepage`) not found or unexpected structure in response:',
-                homeResponse.data.data,
-            );
-            // Keep cms.value as null if data is not found at the expected path
-        }
-
-        // Process blog data
-        if (blogResponse.data.data?.posts?.nodes) {
-            // Filter out posts without necessary blog data (thumbnail and title)
-            latestPosts.value = blogResponse.data.data.posts.nodes.filter(
-                (post: any) =>
-                    post.blog?.blogContent?.thumbnail?.node?.sourceUrl &&
-                    (post.blog?.blogContent?.title || post.title),
-            );
-        } else {
-            console.warn('Latest blog posts not found or unexpected structure:', blogResponse.data);
-            latestPosts.value = [];
-        }
-    } catch (err) {
-        console.error('Error fetching data for HomePage:', err);
-        // Set a general error, but don't nullify data that might have been fetched successfully before the error.
-        // Individual checks within the 'try' block already handle cases where data might be missing from a specific response.
-        error.value = err as Error;
-        // cms.value = null; // Avoid nullifying potentially successful fetches
-        // latestPosts.value = []; // Avoid nullifying potentially successful fetches
-    } finally {
-        loading.value = false;
+onMounted(() => {
+    // Check cache first - only set loading false if BOTH are cached
+    if (cms.value && latestPosts.value && latestPosts.value.length > 0) {
+        loading.value = false; // Data from cache, not loading initially
+    } else {
+        loading.value = true; // No cache or partial cache, initial load state
     }
+
+    // Define the fetch function
+    const fetchHomePageData = async () => {
+        const initialLoad = loading.value; // Check if this is the very first load
+        error.value = null; // Clear previous errors before fetching
+
+        try {
+            const [homeResponse, blogResponse] = await Promise.all([
+                axios.post('https://admin.alphatalentmanagement.com/graphql', { query: GET_HOME }),
+                axios.post('https://admin.alphatalentmanagement.com/graphql', {
+                    query: GET_LATEST_BLOGS,
+                }),
+            ]);
+
+            // Log the raw homepage response for debugging
+            // console.log('Raw homeResponse:', JSON.stringify(homeResponse.data, null, 2));
+
+            // Check for GraphQL errors specifically for the homepage query
+            if (homeResponse.data.errors) {
+                console.error('GraphQL errors in homeResponse:', homeResponse.data.errors);
+            }
+
+            // Process homepage data
+            if (homeResponse.data.data?.page?.homepage) {
+                cms.value = homeResponse.data.data.page.homepage as HomePageData;
+                // console.log('Processed cms data:', JSON.stringify(cms.value, null, 2));
+            } else {
+                console.warn(
+                    'Homepage data object (`page.homepage`) not found or unexpected structure in response:',
+                    homeResponse.data.data,
+                );
+                // Keep potentially stale cms.value if fetch fails partially
+            }
+
+            // Process blog data
+            if (blogResponse.data.data?.posts?.nodes) {
+                // Filter out posts without necessary blog data (thumbnail and title)
+                latestPosts.value = blogResponse.data.data.posts.nodes.filter(
+                    (post: any) =>
+                        post.blog?.blogContent?.thumbnail?.node?.sourceUrl &&
+                        (post.blog?.blogContent?.title || post.title),
+                );
+            } else {
+                console.warn(
+                    'Latest blog posts not found or unexpected structure:',
+                    blogResponse.data,
+                );
+                // Keep potentially stale latestPosts.value if fetch fails partially
+            }
+        } catch (err) {
+            console.error('Error fetching data for HomePage:', err);
+            error.value = err as Error;
+            // Keep potentially stale data in storage
+        } finally {
+            // Only set loading to false in finally if it was the initial load
+            if (initialLoad) {
+                loading.value = false;
+            }
+        }
+    };
+
+    // Trigger the fetch in the background (don't await)
+    fetchHomePageData();
 });
 </script>
 

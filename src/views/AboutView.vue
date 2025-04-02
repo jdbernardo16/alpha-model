@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
+import { useStorage } from '@vueuse/core';
 import axios from 'axios';
 interface ImageNode {
     id: string;
@@ -44,20 +45,61 @@ const GET_ABOUT = `
     }
 `;
 
-const cms = ref<AboutUsData | null>(null);
+const cms = useStorage<AboutUsData | null>('aboutPageData', null);
 const loading = ref(true);
 const error = ref<Error | null>(null);
-onMounted(async () => {
-    try {
-        const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
-            query: GET_ABOUT,
-        });
-        cms.value = response.data.data.page.aboutUs;
-    } catch (err) {
-        error.value = err as Error;
-    } finally {
-        loading.value = false;
+onMounted(() => {
+    // Check cache first
+    if (cms.value) {
+        loading.value = false; // Data from cache, not loading initially
+    } else {
+        loading.value = true; // No cache, initial load state
     }
+
+    // Define the fetch function
+    const fetchAboutData = async () => {
+        const initialLoad = loading.value; // Check if this is the very first load
+        error.value = null; // Clear previous errors
+
+        try {
+            const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
+                query: GET_ABOUT,
+            });
+
+            if (response.data.data?.page?.aboutUs) {
+                cms.value = response.data.data.page.aboutUs; // Update storage/ref
+            } else {
+                console.warn('About Us data not found or unexpected structure:', response.data);
+                // Keep potentially stale cms.value if fetch fails
+            }
+
+            // Handle GraphQL errors if they exist
+            if (response.data.errors) {
+                console.error('GraphQL errors fetching About Us:', response.data.errors);
+                if (!error.value) {
+                    // Don't overwrite specific errors like 'not found'
+                    error.value = new Error(
+                        response.data.errors.map((e: any) => e.message).join(', '),
+                    );
+                }
+            }
+        } catch (err) {
+            console.error('Error fetching About Us data:', err);
+            if (!error.value) {
+                // Don't overwrite specific errors
+                error.value = err as Error;
+            }
+            // Keep potentially stale data in storage
+        } finally {
+            // Only set loading to false if it was the initial load
+            if (initialLoad) {
+                loading.value = false;
+            }
+        }
+    };
+
+    // Trigger the fetch in the background
+    fetchAboutData();
 });
 </script>
 <template>

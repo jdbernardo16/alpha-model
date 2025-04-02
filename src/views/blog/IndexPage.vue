@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useStorage } from '@vueuse/core';
 import axios from 'axios';
 import type { Post } from '@/types'; // Assuming a Post type exists or needs creation
 
@@ -35,34 +36,52 @@ const GET_BLOGS = `
     }
 `;
 
-const allPosts = ref<Post[]>([]); // Initialize with empty array
+const allPosts = useStorage<Post[]>('blogIndexData', []); // Use storage
 const loading = ref(true);
 const error = ref<Error | null>(null);
 
-onMounted(async () => {
-    loading.value = true;
-    error.value = null;
-    try {
-        const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
-            query: GET_BLOGS,
-        });
-
-        if (response.data.data?.posts?.nodes) {
-            // Filter out posts that don't have the necessary ACF blog data
-            allPosts.value = response.data.data.posts.nodes.filter(
-                (node: any) => node.blog?.blogContent,
-            );
-        } else {
-            console.warn('No blog posts found or unexpected data structure:', response.data);
-            allPosts.value = []; // Set to empty array if no data
-        }
-    } catch (err) {
-        console.error('Error fetching blog posts:', err);
-        error.value = err as Error;
-        allPosts.value = []; // Clear posts on error
-    } finally {
-        loading.value = false;
+onMounted(() => {
+    // Check cache first
+    if (allPosts.value && allPosts.value.length > 0) {
+        loading.value = false; // Data from cache, not loading initially
+    } else {
+        loading.value = true; // No cache, initial load state
     }
+
+    // Define the fetch function
+    const fetchBlogPosts = async () => {
+        const initialLoad = loading.value; // Check if this is the very first load
+        error.value = null; // Clear previous errors
+
+        try {
+            const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
+                query: GET_BLOGS,
+            });
+
+            if (response.data.data?.posts?.nodes) {
+                // Filter out posts that don't have the necessary ACF blog data
+                const freshPosts = response.data.data.posts.nodes.filter(
+                    (node: any) => node.blog?.blogContent,
+                );
+                allPosts.value = freshPosts; // Update storage/ref
+            } else {
+                console.warn('No blog posts found or unexpected data structure:', response.data);
+                // Keep potentially stale allPosts.value if fetch fails
+            }
+        } catch (err) {
+            console.error('Error fetching blog posts:', err);
+            error.value = err as Error;
+            // Keep potentially stale data in storage
+        } finally {
+            // Only set loading to false if it was the initial load
+            if (initialLoad) {
+                loading.value = false;
+            }
+        }
+    };
+
+    // Trigger the fetch in the background
+    fetchBlogPosts();
 });
 
 // Pagination

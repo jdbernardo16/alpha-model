@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
+import { useStorage } from '@vueuse/core';
 import axios from 'axios';
 import type { Talent, FeaturedTalent } from '@/types'; // Import FeaturedTalent
 
@@ -67,6 +68,11 @@ query GetFeaturedTalents {
                     }
                     address
                 }
+                frame1 {
+                    talents {
+                        label
+                    }
+                }
                 frame2 {
                     description
                 }
@@ -86,12 +92,12 @@ query GetFeaturedTalents {
 }
 `;
 
-const talents = ref<Talent[] | null>(null);
+const talents = useStorage<Talent[] | null>('talentsListData', null);
 const loading = ref(true);
 const error = ref<Error | null>(null);
 
 // State for Featured Talent
-const featuredTalent = ref<FeaturedTalent | null>(null);
+const featuredTalent = useStorage<FeaturedTalent | null>('featuredTalentData', null);
 const featuredLoading = ref(true);
 const featuredError = ref<Error | null>(null);
 
@@ -103,54 +109,73 @@ const sortedTalents = computed(() => {
     return null;
 });
 
-onMounted(async () => {
-    // Fetch both regular talents and featured talent concurrently
-    const fetchTalents = axios.post('https://admin.alphatalentmanagement.com/graphql', {
-        query: GET_TALENTS,
-    });
-    const fetchFeatured = axios.post('https://admin.alphatalentmanagement.com/graphql', {
-        query: GET_FEATURED_TALENTS,
-    });
+onMounted(() => {
+    // Check cache first and set initial loading states
+    const initialTalentsLoading = !talents.value || talents.value.length === 0;
+    const initialFeaturedLoading = !featuredTalent.value;
+    loading.value = initialTalentsLoading;
+    featuredLoading.value = initialFeaturedLoading;
 
-    try {
-        const [talentsResponse, featuredResponse] = await Promise.all([
-            fetchTalents,
-            fetchFeatured,
-        ]);
+    // Define the fetch function
+    const fetchTalentData = async () => {
+        error.value = null; // Clear previous errors
+        featuredError.value = null;
 
-        // Process regular talents
-        if (talentsResponse.data.data?.talents?.nodes) {
-            talents.value = talentsResponse.data.data.talents.nodes;
-        } else {
-            console.warn(
-                'No regular talents found or unexpected data structure:',
-                talentsResponse.data,
-            );
-            talents.value = []; // Set to empty array if no data
+        try {
+            const [talentsResponse, featuredResponse] = await Promise.all([
+                axios.post('https://admin.alphatalentmanagement.com/graphql', {
+                    query: GET_TALENTS,
+                }),
+                axios.post('https://admin.alphatalentmanagement.com/graphql', {
+                    query: GET_FEATURED_TALENTS,
+                }),
+            ]);
+
+            // Process regular talents
+            if (talentsResponse.data.data?.talents?.nodes) {
+                talents.value = talentsResponse.data.data.talents.nodes;
+            } else {
+                console.warn(
+                    'No regular talents found or unexpected data structure:',
+                    talentsResponse.data,
+                );
+                // Keep potentially stale talents.value if fetch fails partially
+            }
+
+            // Process featured talent
+            if (
+                featuredResponse.data.data?.featuredTalents?.nodes &&
+                featuredResponse.data.data.featuredTalents.nodes.length > 0
+            ) {
+                // Assuming we only want the first featured talent
+                featuredTalent.value = featuredResponse.data.data.featuredTalents.nodes[0];
+            } else {
+                console.warn(
+                    'No featured talents found or unexpected data structure:',
+                    featuredResponse.data,
+                );
+                // Keep potentially stale featuredTalent.value if fetch fails partially
+                // If you want to explicitly clear it if the fetch returns nothing:
+                // featuredTalent.value = null;
+            }
+        } catch (err) {
+            console.error('Error fetching talents:', err);
+            // Set errors, but keep potentially stale data in storage
+            error.value = err as Error;
+            featuredError.value = err as Error;
+        } finally {
+            // Only set loading to false if it was the initial load for that data
+            if (initialTalentsLoading) {
+                loading.value = false;
+            }
+            if (initialFeaturedLoading) {
+                featuredLoading.value = false;
+            }
         }
+    };
 
-        // Process featured talent
-        if (
-            featuredResponse.data.data?.featuredTalents?.nodes &&
-            featuredResponse.data.data.featuredTalents.nodes.length > 0
-        ) {
-            // Assuming we only want the first featured talent
-            featuredTalent.value = featuredResponse.data.data.featuredTalents.nodes[0];
-        } else {
-            console.warn(
-                'No featured talents found or unexpected data structure:',
-                featuredResponse.data,
-            );
-            // Handle case where no featured talent is found - maybe show a default or hide the section
-        }
-    } catch (err) {
-        console.error('Error fetching talents:', err);
-        error.value = err as Error; // General error for the main list
-        featuredError.value = err as Error; // Specific error for the featured section
-    } finally {
-        loading.value = false;
-        featuredLoading.value = false;
-    }
+    // Trigger the fetch in the background
+    fetchTalentData();
 });
 
 // Helper function to extract hostname from URL
@@ -363,6 +388,16 @@ const getHostname = (urlString: string | undefined): string => {
                                     <p class="text-lg">
                                         {{ talent.talentContent?.frame1?.address }}
                                     </p>
+                                    <div>
+                                        <span
+                                            v-for="(tag, index) in talent?.talentContent?.frame1
+                                                ?.talents"
+                                            :key="index"
+                                            class="inline-block mr-2 last:mr-0 font-light"
+                                        >
+                                            {{ tag.label }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
