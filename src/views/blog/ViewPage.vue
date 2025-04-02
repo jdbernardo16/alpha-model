@@ -1,9 +1,10 @@
 <template>
-    <div class="max-w-4xl mx-auto px-4 py-12">
+    <div class="max-w-4xl mx-auto px-4 py-12 relative">
         <!-- Back to blog link -->
         <div class="mb-8">
-            <router-link
-                to="/blogs"
+            <a
+                href="#"
+                @click.prevent="goBack"
                 class="inline-flex items-center text-gray-600 hover:text-black transition-colors"
             >
                 <svg
@@ -20,12 +21,15 @@
                         d="M10 19l-7-7m0 0l7-7m-7 7h18"
                     />
                 </svg>
-                Back to Blog
-            </router-link>
+                Go Back
+            </a>
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="text-center py-16">
+        <div
+            v-if="loading"
+            class="text-center py-16 min-h-screen bg-white grid place-content-center fixed top-0 left-0 w-full"
+        >
             <p>Loading post...</p>
             <!-- Optional: Add a spinner -->
         </div>
@@ -138,7 +142,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import type { Post } from '@/types';
 
@@ -146,6 +150,7 @@ const route = useRoute();
 const slug = computed(() => route.params.slug as string); // Ensure slug is treated as string
 
 const post = ref<Post | null>(null);
+const router = useRouter();
 const loading = ref(true);
 const error = ref<Error | null>(null);
 
@@ -310,5 +315,10 @@ const submitComment = () => {
         comment: '',
     };
     alert('Comment submitted successfully!');
+};
+
+// Go back function
+const goBack = () => {
+    router.go(-1);
 };
 </script>

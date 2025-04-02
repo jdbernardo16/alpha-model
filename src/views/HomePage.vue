@@ -50,8 +50,8 @@ const GET_HOME = `
 
 // Query to get the latest 6 blog posts
 const GET_LATEST_BLOGS = `
-    query GetLatestBlogs {
-        posts(first: 6, where: { orderby: { field: DATE, order: DESC } }) {
+    query GetNews {
+        posts (where: {categoryName: "news"}){
             nodes {
                 title
                 slug

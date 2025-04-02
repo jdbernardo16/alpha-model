@@ -7,7 +7,7 @@ import type { Post } from '@/types'; // Assuming a Post type exists or needs cre
 // GraphQL Query
 const GET_BLOGS = `
     query getBlogs {
-        posts {
+        posts (where: {categoryName: "blog"}) {
             nodes {
                 title # Top-level title (might differ from blog.blogContent.title)
                 slug
