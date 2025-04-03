@@ -38,6 +38,16 @@ const GET_HOME = `
                     }
                     frame3 {
                         title
+                        newsItem {
+                            label
+                            poster {
+                                node {
+                                    sourceUrl
+                                    altText
+                                    id
+                                }
+                            }
+                        }
                     }
                     frame4 {
                         title
@@ -48,41 +58,13 @@ const GET_HOME = `
         }
     }`;
 
-// Query to get the latest 6 blog posts
-const GET_LATEST_BLOGS = `
-    query GetNews {
-        posts (where: {categoryName: "news"}){
-            nodes {
-                title
-                slug
-                ... on WithAcfBlog {
-                    blog {
-                        blogContent {
-                            thumbnail {
-                                node {
-                                    sourceUrl
-                                    altText
-                                    id
-                                }
-                            }
-                            title # Use nested title
-                        }
-                        # No need for isFeatured or full content here
-                    }
-                }
-            }
-        }
-    }
-`;
-
 const cms = useStorage<HomePageData | null>('homePageData', null);
-const latestPosts = useStorage<Post[]>('homeLatestPosts', []); // Use storage for posts
 const loading = ref(true); // Combined loading state for simplicity
 const error = ref<Error | null>(null); // Combined error state
 
 onMounted(() => {
     // Check cache first - only set loading false if BOTH are cached
-    if (cms.value && latestPosts.value && latestPosts.value.length > 0) {
+    if (cms.value) {
         loading.value = false; // Data from cache, not loading initially
     } else {
         loading.value = true; // No cache or partial cache, initial load state
@@ -94,11 +76,8 @@ onMounted(() => {
         error.value = null; // Clear previous errors before fetching
 
         try {
-            const [homeResponse, blogResponse] = await Promise.all([
+            const [homeResponse] = await Promise.all([
                 axios.post('https://admin.alphatalentmanagement.com/graphql', { query: GET_HOME }),
-                axios.post('https://admin.alphatalentmanagement.com/graphql', {
-                    query: GET_LATEST_BLOGS,
-                }),
             ]);
 
             // Log the raw homepage response for debugging
@@ -119,22 +98,6 @@ onMounted(() => {
                     homeResponse.data.data,
                 );
                 // Keep potentially stale cms.value if fetch fails partially
-            }
-
-            // Process blog data
-            if (blogResponse.data.data?.posts?.nodes) {
-                // Filter out posts without necessary blog data (thumbnail and title)
-                latestPosts.value = blogResponse.data.data.posts.nodes.filter(
-                    (post: any) =>
-                        post.blog?.blogContent?.thumbnail?.node?.sourceUrl &&
-                        (post.blog?.blogContent?.title || post.title),
-                );
-            } else {
-                console.warn(
-                    'Latest blog posts not found or unexpected structure:',
-                    blogResponse.data,
-                );
-                // Keep potentially stale latestPosts.value if fetch fails partially
             }
         } catch (err) {
             console.error('Error fetching data for HomePage:', err);
@@ -194,7 +157,7 @@ onMounted(() => {
         </div>
     </section>
 
-    <news-slider :cms="cms?.frame3" :posts="latestPosts" />
+    <news-slider :cms="cms?.frame3" />
 
     <ProjectForm :cms="cms?.frame4" />
 </template>

@@ -10,11 +10,20 @@ const modules = [Navigation, Autoplay];
 import type { Post } from '../../types'; // Import the Post type
 
 const props = defineProps<{
-    posts?: Post[]; // Use the Post type for the prop
     cms?: {
         header?: string; // Make header optional if not always present
         title: string;
         description?: string; // Make description optional
+        newsItem?: Array<{
+            // Change to Array of objects
+            label: string;
+            poster?: {
+                node?: {
+                    sourceUrl: string;
+                    altText: string;
+                };
+            };
+        }>;
     };
 }>();
 </script>
@@ -47,33 +56,29 @@ const props = defineProps<{
                 class="mySwiper"
             >
                 <!-- Iterate over the posts prop -->
-                <swiper-slide v-for="post in props.posts" :key="post.slug">
-                    <a :href="`/blogs/${post.slug}`">
-                        <div class="w-full">
-                            <div class="aspect-w-[340] aspect-h-[440] mb-4">
-                                <!-- Bind to the correct data structure from the Post type -->
-                                <img
-                                    v-if="post.blog?.blogContent?.thumbnail?.node"
-                                    :src="post.blog.blogContent.thumbnail.node.sourceUrl"
-                                    :alt="
-                                        post.blog.blogContent.thumbnail.node.altText || post.title
-                                    "
-                                    class="w-full h-full object-cover"
-                                />
-                                <!-- Optional: Add a placeholder if image is missing -->
-                                <div
-                                    v-else
-                                    class="w-full h-full bg-gray-200 flex items-center justify-center"
-                                >
-                                    <span>No Image</span>
-                                </div>
+                <swiper-slide v-for="post in props.cms?.newsItem" :key="post?.label">
+                    <div class="w-full">
+                        <div class="aspect-w-[340] aspect-h-[440] mb-4 shadow">
+                            <!-- Bind to the correct data structure from the Post type -->
+                            <img
+                                v-if="post?.poster?.node?.sourceUrl"
+                                :src="post?.poster.node.sourceUrl"
+                                :alt="post?.poster.node.altText"
+                                class="w-full h-full object-cover"
+                            />
+                            <!-- Optional: Add a placeholder if image is missing -->
+                            <div
+                                v-else
+                                class="w-full h-full bg-gray-200 flex items-center justify-center"
+                            >
+                                <span>No Image</span>
                             </div>
-                            <!-- Use the nested title if available, otherwise fallback to the main post title -->
-                            <p class="text-center line-clamp-2">
-                                {{ post.blog?.blogContent?.title || post.title }}
-                            </p>
                         </div>
-                    </a>
+                        <!-- Use the nested title if available, otherwise fallback to the main post title -->
+                        <p class="text-center line-clamp-2">
+                            {{ post?.label }}
+                        </p>
+                    </div>
                 </swiper-slide>
             </swiper>
         </div>

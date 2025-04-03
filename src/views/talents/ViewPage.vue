@@ -44,7 +44,7 @@ query GetTalentBySlug($slug:ID !) {
                         }
                     }
                     attributes {
-                        bust cup dress eyes hair height hip shoes waist
+                        bust cup dress eyes hair height hip shoes waist weight
                     }
                     address
                 }
@@ -293,6 +293,15 @@ watch(
                                         {{ talent.talentContent.frame1.attributes.eyes }}
                                     </div>
                                 </template>
+
+                                <template v-if="talent.talentContent.frame1.attributes?.weight">
+                                    <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                        WEIGHT
+                                    </div>
+                                    <div class="col-span-4 border-b border-gray-100 pb-2">
+                                        {{ talent.talentContent.frame1.attributes.weight }}
+                                    </div>
+                                </template>
                             </div>
                             <p class="mb-4 uppercase">
                                 Follow
@@ -347,11 +356,6 @@ watch(
                             <div
                                 class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-500"
                             ></div>
-                            <div
-                                class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 text-white text-xs sm:text-sm tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                            >
-                                {{ image.title || `PORTFOLIO.${index + 1}` }}
-                            </div>
                         </div>
                     </swiper-slide>
                 </swiper-container>

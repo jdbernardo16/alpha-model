@@ -81,6 +81,7 @@ export interface Talent {
                 hip?: string;
                 shoes?: string;
                 waist?: string;
+                weight?: string;
             };
             address?: string;
         };
