@@ -49,7 +49,18 @@ query GetTalentBySlug($slug:ID !) {
                     address
                 }
                 frame2 {
-                    title description
+                    title description 
+                    video {
+                        youtubeLink
+                        videoFile {
+                            node {
+                                id
+                                title
+                                status
+                                mediaItemUrl
+                            }
+                        }
+                    }
                 }
                 contactDetails {
                     socialMedia {
@@ -374,6 +385,29 @@ watch(
                 class="text-gray-700 leading-relaxed text-base sm:text-lg max-w-3xl font-light italic wysiwyg"
                 v-html="talent.talentContent.frame2.description"
             />
+        </div>
+
+        <!-- YouTube Video Embed -->
+        <div
+            v-if="
+                talent.talentContent?.frame2?.video?.youtubeLink ||
+                talent.talentContent?.frame2?.video?.videoFile?.node?.mediaItemUrl
+            "
+            class="w-full h-full aspect-w-16 aspect-h-9 lg:mb-16 mb-10"
+        >
+            <iframe
+                class="w-full h-full"
+                :src="
+                    talent.talentContent?.frame2?.video?.videoFile?.node?.mediaItemUrl
+                        ? talent.talentContent?.frame2?.video?.videoFile?.node?.mediaItemUrl
+                        : talent.talentContent?.frame2?.video?.youtubeLink
+                "
+                title="YouTube video player"
+                frameborder="0"
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+            ></iframe>
         </div>
 
         <!-- Hire Section with artistic contact presentation -->

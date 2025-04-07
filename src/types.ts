@@ -88,6 +88,17 @@ export interface Talent {
         frame2?: {
             title?: string;
             description?: string;
+            video?: {
+                youtubeLink?: string;
+                videoFile?: {
+                    node: {
+                        id: string;
+                        title?: string; // Title might be optional
+                        status?: string; // Status might be optional
+                        mediaItemUrl: string;
+                    };
+                };
+            };
         };
         frame3?: {
             title?: string;

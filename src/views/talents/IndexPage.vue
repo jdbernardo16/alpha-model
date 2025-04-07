@@ -6,7 +6,7 @@ import type { Talent, FeaturedTalent } from '@/types'; // Import FeaturedTalent
 
 const GET_TALENTS = `
 query GetTalents {
-    talents {
+    talents (first:100) {
         nodes {
             title
             slug

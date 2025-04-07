@@ -34,8 +34,15 @@ defineProps<IProps>();
             class="mySwiper"
         >
             <swiper-slide v-for="i in banner" :key="i.id">
-                <div class="aspect-w-[1425] aspect-h-[891] w-full">
-                    <img class="w-full h-full object-cover" :src="i.sourceUrl" :alt="i.altText" />
+                <div class="h-[60vh] w-full">
+                    <img
+                        class="w-full h-full object-cover position-top"
+                        :src="i.sourceUrl"
+                        :srcset="i.srcSet"
+                        sizes="(max-width: 480px) 100vw, (max-width: 768px) 80vw, (max-width: 1024px) 60vw, 1080px"
+                        :alt="i.altText"
+                        loading="lazy"
+                    />
                 </div>
             </swiper-slide>
         </swiper>

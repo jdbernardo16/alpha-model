@@ -126,7 +126,7 @@ onMounted(() => {
                 {{ cms?.frame2?.title }}
             </p>
             <div
-                class="flex lg:flex-row flex-col items-center justify-between lg:space-x-20 lg:space-y-0 space-y-10"
+                class="flex lg:flex-row flex-col justify-between lg:space-x-20 lg:space-y-0 space-y-10"
             >
                 <div class="w-full lg:w-1/2">
                     <div class="aspect-w-1 aspect-h-1 overflow-hidden">
@@ -138,7 +138,7 @@ onMounted(() => {
                         />
                     </div>
                 </div>
-                <div class="w-full lg:w-1/2">
+                <div class="w-full lg:w-1/2 lg:pt-6 pt-0">
                     <div class="mb-6">
                         <p
                             class="text-xl font-bold mb-3 lg:block hidden font-serif text-primary-gold"
