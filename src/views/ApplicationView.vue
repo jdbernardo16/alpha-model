@@ -1,6 +1,190 @@
+<script setup lang="ts">
+import { ref, reactive, type Ref } from 'vue';
+import { useCountries } from '../composables/useCountries';
+
+const { countries } = useCountries();
+
+const isLoading = ref(false);
+const showSuccessModal = ref(false);
+const submissionError = ref<string | null>(null);
+
+interface FormData {
+    firstName: string;
+    lastName: string;
+    gender: string;
+    dob: string;
+    email: string;
+    phone: string;
+    city: string;
+    state: string;
+    country: string;
+    ethnicity: string;
+    instagram: string;
+}
+
+const form = reactive<FormData>({
+    firstName: '',
+    lastName: '',
+    gender: '',
+    dob: '',
+    email: '',
+    phone: '',
+    city: '',
+    state: '',
+    country: 'United States',
+    ethnicity: '',
+    instagram: '',
+});
+
+const selectedFiles = ref<File[]>([]);
+const fileInput: Ref<HTMLInputElement | null> = ref(null);
+
+const handleFileUpload = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    if (target.files) {
+        selectedFiles.value = Array.from(target.files);
+    }
+};
+
+const handleFileDrop = (event: DragEvent) => {
+    if (event.dataTransfer?.files) {
+        selectedFiles.value = Array.from(event.dataTransfer.files);
+    }
+};
+
+const triggerFileInputClick = () => {
+    // Use optional chaining for safety, in case the ref isn't attached yet
+    fileInput.value?.click();
+};
+
+const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+const submitForm = async () => {
+    isLoading.value = true;
+    submissionError.value = null;
+    showSuccessModal.value = false;
+
+    const wpFormData = new FormData();
+
+    // --- Add Contact Form 7 specific hidden fields ---
+    wpFormData.append('_wpcf7', '665'); // Form ID from user request
+    wpFormData.append('_wpcf7_version', '5.8.5'); // Assuming same version as ProjectForm, adjust if needed
+    wpFormData.append('_wpcf7_locale', 'en_US'); // Adjust if needed
+    wpFormData.append('_wpcf7_unit_tag', 'wpcf7-f665-o1'); // Unit tag based on form ID 665
+    wpFormData.append('_wpcf7_container_post', '0'); // Usually 0
+
+    // --- Append form data (map keys from `form` to CF7 names) ---
+    wpFormData.append('first-name', form.firstName);
+    wpFormData.append('last-name', form.lastName);
+    wpFormData.append('gender', form.gender);
+    wpFormData.append('birth-date', form.dob); // Assuming 'dob' maps to 'birth-date'
+    wpFormData.append('your-email', form.email);
+    wpFormData.append('phone', form.phone);
+    wpFormData.append('city', form.city);
+    wpFormData.append('state-province', form.state); // Assuming 'state' maps to 'state-province'
+    wpFormData.append('country', form.country);
+    wpFormData.append('ethnicity', form.ethnicity);
+    if (form.instagram) {
+        wpFormData.append('instagram-username', form.instagram);
+    }
+
+    // --- Append file attachments ---
+    selectedFiles.value.forEach((file) => {
+        // Use the name specified in the CF7 shortcode: 'file-attachement'
+        wpFormData.append('file-attachment', file, file.name);
+    });
+
+    try {
+        const response = await fetch(
+            // Use VITE_API_BASE_URL from environment variables
+            `${import.meta.env.VITE_API_BASE_URL}/wp-json/contact-form-7/v1/contact-forms/665/feedback`,
+            {
+                method: 'POST',
+                body: wpFormData,
+                // Headers might not be needed if not sending JSON, but keep in mind for future API calls
+                // headers: {
+                //   // 'Content-Type': 'multipart/form-data' // Fetch API sets this automatically for FormData
+                // },
+            },
+        );
+
+        const data = await response.json();
+
+        if (data.status === 'mail_sent') {
+            console.log('Application submitted successfully:', data);
+            showSuccessModal.value = true;
+            // Optionally reset form fields
+            Object.keys(form).forEach((key) => {
+                if (key === 'country') {
+                    form[key] = 'United States'; // Reset country to default
+                } else {
+                    (form as any)[key] = '';
+                }
+            });
+            selectedFiles.value = [];
+        } else {
+            console.error('Application submission failed:', data.message, data);
+            submissionError.value = data.message || 'Submission failed. Please try again.';
+            // Check for validation errors
+            if (data.invalid_fields && data.invalid_fields.length > 0) {
+                submissionError.value = data.invalid_fields
+                    .map((field: any) => `${field.field}: ${field.message}`) // Show field name with error
+                    .join('\n');
+                console.error('Validation errors:', data.invalid_fields);
+            }
+        }
+    } catch (error) {
+        console.error('Error submitting application:', error);
+        submissionError.value = 'An unexpected error occurred. Please try again later.';
+    } finally {
+        isLoading.value = false;
+    }
+};
+</script>
+
 <template>
     <div class="min-h-screen bg-black text-white font-sans">
         <div class="max-w-4xl mx-auto p-6 relative overflow-hidden">
+            <!-- Loading Indicator -->
+            <div
+                v-if="isLoading"
+                class="fixed top-0 left-0 w-full h-screen inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 rounded-xl"
+            >
+                <div
+                    class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-gold"
+                ></div>
+            </div>
+
+            <!-- Success Modal -->
+            <div
+                v-if="showSuccessModal"
+                class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[999]"
+                @click.self="showSuccessModal = false"
+            >
+                <div
+                    class="bg-gray-900 border border-primary-gold/30 p-8 rounded-lg shadow-xl text-center max-w-sm mx-4"
+                >
+                    <h3 class="text-xl font-bold mb-4 text-primary-gold">Success!</h3>
+                    <p class="mb-6 text-gray-300">
+                        Your application has been submitted successfully. We will get back to you
+                        soon.
+                    </p>
+                    <button
+                        @click="showSuccessModal = false"
+                        class="inline-flex justify-center rounded bg-primary-gold px-5 py-2 text-sm font-medium text-black hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-primary-gold"
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
             <!-- Decorative elements -->
             <div
                 class="absolute -top-20 -right-20 w-64 h-64 bg-primary-gold opacity-20 rounded-full blur-3xl"
@@ -179,7 +363,7 @@
                                     type="text"
                                     v-model="form.instagram"
                                     placeholder="Instagram Username"
-                                    class="w-full bg-transparent border-none focus:outline-none"
+                                    class="w-full bg-transparent border-none focus:outline-none focus:ring-0"
                                 />
                             </div>
                         </div>
@@ -212,7 +396,7 @@
 
                     <div
                         class="border-2 border-dashed border-gray-600 rounded-xl p-8 text-center hover:border-yellow-400 transition-colors cursor-pointer"
-                        @click="$refs.fileInput.click()"
+                        @click="triggerFileInputClick"
                         @dragover.prevent
                         @drop.prevent="handleFileDrop"
                     >
@@ -310,97 +494,26 @@
                     </div>
                 </div>
 
+                <!-- Submission Error Message -->
+                <div
+                    v-if="submissionError"
+                    class="mt-6 text-center text-red-400 text-sm whitespace-pre-line"
+                >
+                    <p>Error: {{ submissionError }}</p>
+                </div>
+
                 <!-- Submit Button -->
-                <div class="text-center">
+                <div class="text-center mt-8">
                     <button
                         type="submit"
-                        class="inline-block bg-white text-black font-bold py-4 px-8 rounded-lg transform transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-gold focus:ring-offset-2 focus:ring-offset-black"
+                        :disabled="isLoading"
+                        class="inline-block bg-white text-black font-bold py-4 px-8 rounded-lg transform transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-gold focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        SUBMIT APPLICATION
+                        <span v-if="isLoading">SUBMITTING...</span>
+                        <span v-else>SUBMIT APPLICATION</span>
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </template>
-
-<script setup lang="ts">
-import { ref, reactive, Ref } from 'vue';
-import { useCountries } from '../composables/useCountries';
-
-const { countries } = useCountries();
-
-interface FormData {
-    firstName: string;
-    lastName: string;
-    gender: string;
-    dob: string;
-    email: string;
-    phone: string;
-    city: string;
-    state: string;
-    country: string;
-    ethnicity: string;
-    instagram: string;
-}
-
-const form = reactive<FormData>({
-    firstName: '',
-    lastName: '',
-    gender: '',
-    dob: '',
-    email: '',
-    phone: '',
-    city: '',
-    state: '',
-    country: 'United States',
-    ethnicity: '',
-    instagram: '',
-});
-
-const selectedFiles = ref<File[]>([]);
-const fileInput: Ref<HTMLInputElement | null> = ref(null);
-
-const handleFileUpload = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    if (target.files) {
-        selectedFiles.value = Array.from(target.files);
-    }
-};
-
-const handleFileDrop = (event: DragEvent) => {
-    if (event.dataTransfer?.files) {
-        selectedFiles.value = Array.from(event.dataTransfer.files);
-    }
-};
-
-const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-};
-
-const submitForm = () => {
-    console.log('Form submitted:', form);
-    console.log('Files:', selectedFiles.value);
-
-    // Here you would add your API submission logic
-    // Example:
-    // const formData = new FormData();
-    // Object.entries(form).forEach(([key, value]) => {
-    //   formData.append(key, value);
-    // });
-    // selectedFiles.value.forEach(file => {
-    //   formData.append('files', file);
-    // });
-    //
-    // fetch('your-api-endpoint', {
-    //   method: 'POST',
-    //   body: formData
-    // });
-};
-</script>
