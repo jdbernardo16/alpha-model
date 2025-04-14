@@ -143,6 +143,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useHead } from '@vueuse/head'; // Import useHead
 import axios from 'axios';
 import type { Post } from '@/types';
 
@@ -288,6 +289,61 @@ onMounted(() => {
 watch(slug, (newSlug) => {
     fetchPost(newSlug);
 });
+
+// Watch for changes in post data to update meta tags
+watch(
+    post,
+    (newPost) => {
+        if (newPost?.blog?.blogContent) {
+            const blogContent = newPost.blog.blogContent;
+            const title = `${blogContent.title || newPost.title} - Alpha Talent Management Blog`;
+            // Use teaser, fallback to truncated content, fallback to generic
+            const description = blogContent.teaser
+                ? blogContent.teaser.substring(0, 160) +
+                  (blogContent.teaser.length > 160 ? '...' : '')
+                : blogContent.content
+                  ? blogContent.content.replace(/<[^>]*>?/gm, '').substring(0, 160) + '...'
+                  : `Read the article "${blogContent.title || newPost.title}" on the Alpha Talent Management blog.`;
+            const imageUrl = blogContent.thumbnail?.node?.sourceUrl || '/images/AATM_logo.png'; // Fallback image
+
+            useHead({
+                title: title,
+                meta: [
+                    { name: 'description', content: description },
+                    // Open Graph
+                    { property: 'og:title', content: title },
+                    { property: 'og:description', content: description },
+                    { property: 'og:type', content: 'article' }, // Use 'article' for blog posts
+                    { property: 'article:published_time', content: blogContent.publishedDate }, // Add published time
+                    { property: 'article:author', content: blogContent.author }, // Add author
+                    { property: 'og:image', content: imageUrl },
+                    { property: 'og:url', content: window.location.href },
+                    // Twitter Card
+                    { name: 'twitter:card', content: 'summary_large_image' },
+                    { name: 'twitter:title', content: title },
+                    { name: 'twitter:description', content: description },
+                    { name: 'twitter:image', content: imageUrl },
+                ],
+                link: [
+                    // Add canonical link for the specific blog post
+                    { rel: 'canonical', href: window.location.href },
+                ],
+            });
+        } else {
+            // Set default/loading state meta tags
+            useHead({
+                title: 'Blog Post - Alpha Talent Management',
+                meta: [
+                    {
+                        name: 'description',
+                        content: 'Read articles and news from Alpha Talent Management.',
+                    },
+                ],
+            });
+        }
+    },
+    { immediate: true, deep: true },
+); // Use immediate and deep watch
 
 // Related posts logic removed - needs dynamic implementation
 

@@ -151,6 +151,7 @@
 
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
+import { useHead } from '@vueuse/head'; // Import useHead
 import PayPalButton from './PayPalButtonContainer.vue';
 import { useRoute, useRouter } from 'vue-router';
 import PackageSummary from './PackageSummary.vue';
@@ -258,4 +259,14 @@ const handlePaymentError = (error) => {
 };
 
 const handleSubmit = () => {};
+
+// Set meta tags for the Checkout page, preventing indexing
+useHead({
+    title: 'Checkout - Alpha Talent Management',
+    meta: [
+        { name: 'description', content: 'Complete your sponsorship package purchase.' },
+        { name: 'robots', content: 'noindex, nofollow' }, // Prevent indexing
+    ],
+    // No need for OG/Twitter tags or canonical link for a noindex page
+});
 </script>

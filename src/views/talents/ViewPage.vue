@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'; // Import watch
+import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { useHead } from '@vueuse/head'; // Import useHead
 import axios from 'axios';
 import type { Talent } from '@/types';
 // Import Swiper Vue.js components
@@ -174,6 +175,65 @@ watch(
         }
     },
 );
+
+// Watch for changes in talent data to update meta tags
+watch(
+    talent,
+    (newTalent) => {
+        if (newTalent?.talentContent?.frame1?.fullName) {
+            const title = `${newTalent.talentContent.frame1.fullName} - Alpha Talent Management`;
+            // Attempt to get a description, fallback if not available
+            const description = newTalent.talentContent.frame2?.description
+                ? newTalent.talentContent.frame2.description
+                      .replace(/<[^>]*>?/gm, '')
+                      .substring(0, 160) + '...' // Strip HTML and truncate
+                : `View the profile and portfolio of ${newTalent.talentContent.frame1.fullName} at Alpha Talent Management.`;
+
+            useHead({
+                title: title,
+                meta: [
+                    { name: 'description', content: description },
+                    // Add Open Graph tags for social sharing
+                    { property: 'og:title', content: title },
+                    { property: 'og:description', content: description },
+                    { property: 'og:type', content: 'profile' },
+                    // Optionally add og:image using the thumbnail or first portfolio image
+                    {
+                        property: 'og:image',
+                        content:
+                            newTalent.talentContent.frame1.thumbnail?.node?.sourceUrl ||
+                            newTalent.talentContent.frame1.images?.nodes?.[0]?.sourceUrl ||
+                            '/images/AATM_logo.png', // Fallback image
+                    },
+                    { property: 'og:url', content: window.location.href }, // Use current URL
+                    // Add Twitter Card tags
+                    { name: 'twitter:card', content: 'summary_large_image' },
+                    { name: 'twitter:title', content: title },
+                    { name: 'twitter:description', content: description },
+                    {
+                        name: 'twitter:image',
+                        content:
+                            newTalent.talentContent.frame1.thumbnail?.node?.sourceUrl ||
+                            newTalent.talentContent.frame1.images?.nodes?.[0]?.sourceUrl ||
+                            '/images/AATM_logo.png', // Fallback image
+                    },
+                ],
+            });
+        } else {
+            // Set default or loading state meta tags if needed
+            useHead({
+                title: 'Talent Profile - Alpha Talent Management',
+                meta: [
+                    {
+                        name: 'description',
+                        content: 'View talent profiles at Alpha Talent Management.',
+                    },
+                ],
+            });
+        }
+    },
+    { immediate: true, deep: true },
+); // Use immediate and deep watch
 </script>
 
 <template>

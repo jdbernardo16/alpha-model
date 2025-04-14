@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue'; // Import watch
 import { useStorage } from '@vueuse/core';
+import { useHead } from '@vueuse/head'; // Import useHead
 import axios from 'axios';
 interface ImageNode {
     id: string;
@@ -101,6 +102,51 @@ onMounted(() => {
     // Trigger the fetch in the background
     fetchAboutData();
 });
+
+// Set meta tags for the About page
+watch(
+    cms,
+    (newCms) => {
+        if (newCms?.frame1) {
+            const title = `${newCms.frame1.title || 'About Us'} - Alpha Talent Management`;
+            const description = newCms.frame1.description
+                ? newCms.frame1.description.replace(/<[^>]*>?/gm, '').substring(0, 160) + '...'
+                : 'Learn more about Alpha Talent Management, our mission, and our team.';
+            const imageUrl = newCms.frame1.image?.node?.sourceUrl || '/images/AATM_logo.png'; // Fallback image
+
+            useHead({
+                title: title,
+                meta: [
+                    { name: 'description', content: description },
+                    // Open Graph
+                    { property: 'og:title', content: title },
+                    { property: 'og:description', content: description },
+                    { property: 'og:type', content: 'website' },
+                    { property: 'og:image', content: imageUrl },
+                    { property: 'og:url', content: window.location.href },
+                    // Twitter Card
+                    { name: 'twitter:card', content: 'summary_large_image' },
+                    { name: 'twitter:title', content: title },
+                    { name: 'twitter:description', content: description },
+                    { name: 'twitter:image', content: imageUrl },
+                ],
+                link: [
+                    // Add canonical link for the about page
+                    { rel: 'canonical', href: window.location.href },
+                ],
+            });
+        } else {
+            // Set default/loading state meta tags
+            useHead({
+                title: 'About Us - Alpha Talent Management',
+                meta: [
+                    { name: 'description', content: 'Learn more about Alpha Talent Management.' },
+                ],
+            });
+        }
+    },
+    { immediate: true, deep: true },
+); // Use immediate and deep watch
 </script>
 <template>
     <div class="min-h-screen bg-gradient-to-b from-gray-100 to-white">

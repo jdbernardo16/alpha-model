@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useStorage } from '@vueuse/core';
+import { useHead } from '@vueuse/head'; // Import useHead
 import axios from 'axios';
 import type { Post } from '@/types'; // Assuming a Post type exists or needs creation
 
@@ -125,6 +126,38 @@ const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('en-US', options);
 };
+
+// Set meta tags for the Blog Index page
+useHead({
+    title: 'Blog - Alpha Talent Management',
+    meta: [
+        {
+            name: 'description',
+            content: 'Read the latest news, articles, and insights from Alpha Talent Management.',
+        },
+        // Open Graph
+        { property: 'og:title', content: 'Blog - Alpha Talent Management' },
+        {
+            property: 'og:description',
+            content: 'Read the latest news, articles, and insights from Alpha Talent Management.',
+        },
+        { property: 'og:type', content: 'website' }, // Or 'blog'
+        { property: 'og:image', content: '/images/AATM_logo.png' }, // Use a relevant general image or logo
+        { property: 'og:url', content: window.location.href },
+        // Twitter Card
+        { name: 'twitter:card', content: 'summary' },
+        { name: 'twitter:title', content: 'Blog - Alpha Talent Management' },
+        {
+            name: 'twitter:description',
+            content: 'Read the latest news, articles, and insights from Alpha Talent Management.',
+        },
+        { name: 'twitter:image', content: '/images/AATM_logo.png' },
+    ],
+    link: [
+        // Add canonical link for the blog index page
+        { rel: 'canonical', href: window.location.href },
+    ],
+});
 </script>
 <template>
     <div class="max-w-7xl mx-auto px-4 py-12 lg:min-h-screen">

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue'; // Import watch
+import { useHead } from '@vueuse/head'; // Import useHead
 import axios from 'axios';
 import Accordion from '@/components/general/Accordion.vue';
 import Countdown from '@/components/general/Countdown.vue';
@@ -131,6 +132,58 @@ const showHighlightImage = (imageIndex: number) => {
 const onHide = () => {
     visible.value = false;
 };
+
+// Set meta tags for the Events page
+watch(
+    cms,
+    (newCms) => {
+        if (newCms?.defaultBanner) {
+            const title = `${newCms.defaultBanner.title || 'Events'} - Alpha Talent Management`;
+            const description = newCms.defaultBanner.description
+                ? newCms.defaultBanner.description.substring(0, 160) +
+                  (newCms.defaultBanner.description.length > 160 ? '...' : '')
+                : 'Join Alpha Talent Management events. Stay updated on upcoming promotions and highlights.';
+            // Use upcoming event background or a fallback
+            const imageUrl =
+                newCms.upcomingEvents?.background?.node?.sourceUrl || '/images/AATM_logo.png';
+
+            useHead({
+                title: title,
+                meta: [
+                    { name: 'description', content: description },
+                    // Open Graph
+                    { property: 'og:title', content: title },
+                    { property: 'og:description', content: description },
+                    { property: 'og:type', content: 'website' }, // Could be 'event.list' if more specific schema exists
+                    { property: 'og:image', content: imageUrl },
+                    { property: 'og:url', content: window.location.href },
+                    // Twitter Card
+                    { name: 'twitter:card', content: 'summary_large_image' },
+                    { name: 'twitter:title', content: title },
+                    { name: 'twitter:description', content: description },
+                    { name: 'twitter:image', content: imageUrl },
+                ],
+                link: [
+                    // Add canonical link for the events index page
+                    { rel: 'canonical', href: window.location.href },
+                ],
+            });
+        } else {
+            // Set default/loading state meta tags
+            useHead({
+                title: 'Events - Alpha Talent Management',
+                meta: [
+                    {
+                        name: 'description',
+                        content:
+                            'Join Alpha Talent Management events. Stay updated on upcoming promotions and highlights.',
+                    },
+                ],
+            });
+        }
+    },
+    { immediate: true, deep: true },
+); // Use immediate and deep watch
 </script>
 <template>
     <section

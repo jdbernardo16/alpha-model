@@ -35,8 +35,22 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
+import { useHead } from '@vueuse/head'; // Import useHead
 import { CheckCircleIcon } from '@heroicons/vue/24/outline';
 
 const route = useRoute();
 const orderDetails = computed(() => JSON.parse(route.query.orderDetails));
+
+// Set meta tags for the Success page, preventing indexing
+useHead({
+    title: 'Payment Successful - Alpha Talent Management',
+    meta: [
+        {
+            name: 'description',
+            content: 'Your payment was successful. Thank you for your purchase.',
+        },
+        { name: 'robots', content: 'noindex, nofollow' }, // Prevent indexing
+    ],
+    // No need for OG/Twitter tags or canonical link for a noindex page
+});
 </script>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue'; // Import watch
 import { useStorage } from '@vueuse/core';
+import { useHead } from '@vueuse/head'; // Import useHead
 import axios from 'axios';
 import type { HomePageData, Post } from '../types';
 import HeroBanner from '../components/slider/HeroBanner.vue';
@@ -114,6 +115,41 @@ onMounted(() => {
     // Trigger the fetch in the background (don't await)
     fetchHomePageData();
 });
+
+// Set meta tags for the Home page
+watch(
+    cms,
+    (newCms) => {
+        const title = 'Alpha Talent Management - Premier Talent Agency';
+        const description = newCms?.frame2?.description
+            ? newCms.frame2.description.replace(/<[^>]*>?/gm, '').substring(0, 160) + '...'
+            : 'Discover top models, actors, and influencers at Alpha Talent Management. Your premier source for professional talent.';
+        const imageUrl = newCms?.frame2?.image?.node?.sourceUrl || '/images/AATM_logo.png'; // Use frame2 image or fallback
+
+        useHead({
+            title: title,
+            meta: [
+                { name: 'description', content: description },
+                // Open Graph
+                { property: 'og:title', content: title },
+                { property: 'og:description', content: description },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:image', content: imageUrl },
+                { property: 'og:url', content: window.location.origin }, // Base URL for home
+                // Twitter Card
+                { name: 'twitter:card', content: 'summary_large_image' },
+                { name: 'twitter:title', content: title },
+                { name: 'twitter:description', content: description },
+                { name: 'twitter:image', content: imageUrl },
+            ],
+            link: [
+                // Add canonical link for the homepage
+                { rel: 'canonical', href: window.location.origin },
+            ],
+        });
+    },
+    { immediate: true, deep: true },
+);
 </script>
 
 <template>

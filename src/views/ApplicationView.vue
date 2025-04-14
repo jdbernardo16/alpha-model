@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, type Ref } from 'vue';
+import { useHead } from '@vueuse/head'; // Import useHead
 import { useCountries } from '../composables/useCountries';
 
 const { countries } = useCountries();
@@ -148,6 +149,41 @@ const submitForm = async () => {
         isLoading.value = false;
     }
 };
+
+// Set meta tags for the Application page
+useHead({
+    title: 'Become a Talent - Apply to Alpha Talent Management',
+    meta: [
+        {
+            name: 'description',
+            content:
+                'Apply to join Alpha Talent Management. Submit your application to become a model, actor, or influencer with our agency.',
+        },
+        // Open Graph
+        { property: 'og:title', content: 'Become a Talent - Apply to Alpha Talent Management' },
+        {
+            property: 'og:description',
+            content:
+                'Apply to join Alpha Talent Management. Submit your application to become a model, actor, or influencer with our agency.',
+        },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:image', content: '/images/AATM_logo.png' }, // Use a relevant general image or logo
+        { property: 'og:url', content: window.location.href },
+        // Twitter Card
+        { name: 'twitter:card', content: 'summary' },
+        { name: 'twitter:title', content: 'Become a Talent - Apply to Alpha Talent Management' },
+        {
+            name: 'twitter:description',
+            content:
+                'Apply to join Alpha Talent Management. Submit your application to become a model, actor, or influencer with our agency.',
+        },
+        { name: 'twitter:image', content: '/images/AATM_logo.png' },
+    ],
+    link: [
+        // Add canonical link for the application page
+        { rel: 'canonical', href: window.location.href },
+    ],
+});
 </script>
 
 <template>

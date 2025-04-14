@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Disallow specific paths if needed (e.g., admin areas, checkout process)
+# Disallow: /admin
+# Disallow: /checkout
+
+Sitemap: https://alphatalentmanagement.com/sitemap.xml

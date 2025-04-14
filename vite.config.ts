@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue';
 import vueDevTools from 'vite-plugin-vue-devtools';
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import compression from 'vite-plugin-compression';
+import Sitemap from 'vite-plugin-sitemap'; // Import Sitemap
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -20,6 +21,13 @@ export default defineConfig({
         compression({
             algorithm: 'gzip',
             ext: '.gz',
+        }),
+        Sitemap({
+            hostname: 'https://alphatalentmanagement.com/',
+            exclude: ['/checkout', '/success'], // Exclude checkout and success pages
+            // Provide static routes via dynamicRoutes (plugin might pick these up)
+            dynamicRoutes: ['/', '/talents', '/blogs', '/become-a-talent', '/about', '/events'],
+            // Note: True dynamic routes like /talents/:slug still require fetching slugs during build.
         }),
     ],
     resolve: {

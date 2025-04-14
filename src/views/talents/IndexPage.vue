@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useStorage } from '@vueuse/core';
+import { useHead } from '@vueuse/head'; // Import useHead
 import axios from 'axios';
 import type { Talent, FeaturedTalent } from '@/types'; // Import FeaturedTalent
 
@@ -189,6 +190,41 @@ const getHostname = (urlString: string | undefined): string => {
         return 'Link'; // Fallback for invalid URLs
     }
 };
+
+// Set meta tags for the Talents Index page
+useHead({
+    title: 'Talents - Alpha Talent Management',
+    meta: [
+        {
+            name: 'description',
+            content:
+                'Browse the diverse portfolio of professional models, actors, and influencers available at Alpha Talent Management.',
+        },
+        // Open Graph
+        { property: 'og:title', content: 'Talents - Alpha Talent Management' },
+        {
+            property: 'og:description',
+            content:
+                'Browse the diverse portfolio of professional models, actors, and influencers available at Alpha Talent Management.',
+        },
+        { property: 'og:type', content: 'website' }, // Or 'profile:list' if more appropriate
+        { property: 'og:image', content: '/images/AATM_logo.png' }, // Use a relevant general image or logo
+        { property: 'og:url', content: window.location.href },
+        // Twitter Card
+        { name: 'twitter:card', content: 'summary' },
+        { name: 'twitter:title', content: 'Talents - Alpha Talent Management' },
+        {
+            name: 'twitter:description',
+            content:
+                'Browse the diverse portfolio of professional models, actors, and influencers available at Alpha Talent Management.',
+        },
+        { name: 'twitter:image', content: '/images/AATM_logo.png' },
+    ],
+    link: [
+        // Add canonical link for the talents index page
+        { rel: 'canonical', href: window.location.href },
+    ],
+});
 </script>
 <template>
     <section>
