@@ -176,6 +176,10 @@ export interface PromoEventsData {
             };
         };
     };
+    sponsorshipPackages: {
+        title: string;
+        showThisFrame: boolean;
+    };
     pastEvents: {
         header: string;
         title: string;

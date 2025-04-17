@@ -90,7 +90,12 @@
                 <div class="flex justify-between items-center">
                     <div class="text-sm text-gray-700">Share this article</div>
                     <div class="flex space-x-4">
-                        <a href="#" class="text-gray-500 hover:text-blue-600 transition-colors">
+                        <a
+                            :href="`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(post.blog?.blogContent?.title || post.title || 'Check out this post')}`"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-gray-500 hover:text-blue-600 transition-colors"
+                        >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 class="h-5 w-5"
@@ -102,7 +107,12 @@
                                 />
                             </svg>
                         </a>
-                        <a href="#" class="text-gray-500 hover:text-blue-800 transition-colors">
+                        <a
+                            :href="`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(post.blog?.blogContent?.title || post.title || 'Check out this post')}`"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-gray-500 hover:text-blue-800 transition-colors"
+                        >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 class="h-5 w-5"
@@ -114,7 +124,12 @@
                                 />
                             </svg>
                         </a>
-                        <a href="#" class="text-gray-500 hover:text-red-600 transition-colors">
+                        <a
+                            :href="`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(currentUrl)}&description=${encodeURIComponent(post.blog?.blogContent?.title || post.title || 'Check out this post')}`"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-gray-500 hover:text-red-600 transition-colors"
+                        >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 class="h-5 w-5"
@@ -143,19 +158,31 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useHead } from '@vueuse/head'; // Import useHead
+import { useHead } from '@vueuse/head';
 import axios from 'axios';
 import type { Post } from '@/types';
 
 const route = useRoute();
-const slug = computed(() => route.params.slug as string); // Ensure slug is treated as string
+const router = useRouter();
+const slug = computed(() => route.params.slug as string);
 
 const post = ref<Post | null>(null);
-const router = useRouter();
 const loading = ref(true);
 const error = ref<Error | null>(null);
 
-// GraphQL Query for fetching a single post by slug
+// URL computation that's safe for SSR
+const currentUrl = computed(() => {
+    if (typeof window === 'undefined') return '';
+    return window.location.href;
+});
+
+// Base URL for absolute URLs (important for OG tags)
+const baseUrl = computed(() => {
+    if (typeof window === 'undefined') return 'https://alphatalentmanagement.com';
+    return window.location.origin;
+});
+
+// GraphQL Query remains the same
 const GET_BLOG_BY_SLUG = `
     query GetBlogBySlug($slug: ID!) {
         post(id: $slug, idType: SLUG) {
@@ -176,16 +203,23 @@ const GET_BLOG_BY_SLUG = `
                         publishedDate
                         author
                         category
-                        content # Fetch full content here
+                        content
                     }
-                    isFeatured # Keep for consistency, though not used here
+                    isFeatured
                 }
             }
         }
     }
 `;
 
-const fetchPost = (currentSlug: string) => {
+// Format date
+const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+};
+
+// Fetch post function - separated for better organization
+const fetchPost = async (currentSlug: string) => {
     if (!currentSlug) {
         error.value = new Error('Blog slug is missing or invalid.');
         loading.value = false;
@@ -193,159 +227,155 @@ const fetchPost = (currentSlug: string) => {
         return;
     }
 
-    // Reset state for the current slug
     loading.value = true;
     error.value = null;
-    post.value = null; // Clear previous post data
 
     const storageKey = `blogData_${currentSlug}`;
 
-    // --- Check Cache ---
+    // Try loading from cache first
     try {
         const cachedData = localStorage.getItem(storageKey);
         if (cachedData) {
             post.value = JSON.parse(cachedData);
-            loading.value = false; // Data from cache, not loading initially
+            loading.value = false;
             console.log(`Loaded blog post ${currentSlug} from cache.`);
-        } else {
-            loading.value = true; // No cache, initial load state
+            updateMetaTags(); // Important! Ensure metadata updates even with cached data
         }
     } catch (e) {
         console.error(`Failed to parse cached blog data for ${currentSlug}:`, e);
-        localStorage.removeItem(storageKey); // Clear potentially corrupted cache
-        loading.value = true; // Force loading state if cache fails
+        localStorage.removeItem(storageKey);
     }
 
-    // --- Fetch Data (Stale-While-Revalidate) ---
-    const fetchAndCachePost = async () => {
-        const initialLoad = loading.value; // Check if this is the very first load (no cache)
-        try {
-            const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
-                query: GET_BLOG_BY_SLUG,
-                variables: { slug: currentSlug },
-            });
+    // Always fetch fresh data
+    try {
+        const response = await axios.post('https://admin.alphatalentmanagement.com/graphql', {
+            query: GET_BLOG_BY_SLUG,
+            variables: { slug: currentSlug },
+        });
 
-            const freshData = response.data.data?.post;
+        const freshData = response.data.data?.post;
 
-            if (freshData?.blog?.blogContent) {
-                post.value = freshData; // Update the view
-                // Update cache
-                try {
-                    localStorage.setItem(storageKey, JSON.stringify(freshData));
-                    console.log(`Updated cache for blog post ${currentSlug}.`);
-                } catch (e) {
-                    console.error(`Failed to cache blog data for ${currentSlug}:`, e);
-                }
-                error.value = null; // Clear previous errors on success
-            } else if (freshData) {
-                // Post exists but lacks content
-                console.warn('Post found, but missing ACF blog data:', freshData);
-                error.value = new Error('Post data is incomplete.');
-                // Keep stale cache if it exists, otherwise show error
-                if (!initialLoad) post.value = null; // Clear view if no cache existed
-            } else {
-                // Post not found by slug
-                console.warn('Post not found or unexpected data structure:', response.data);
-                error.value = new Error('Post not found.');
-                // Keep stale cache if it exists, otherwise show error
-                if (!initialLoad) post.value = null; // Clear view if no cache existed
+        if (freshData?.blog?.blogContent) {
+            post.value = freshData;
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(freshData));
+            } catch (e) {
+                console.error(`Failed to cache blog data for ${currentSlug}:`, e);
             }
+            error.value = null;
+            updateMetaTags(); // Update metadata with fresh data
+        } else if (freshData) {
+            console.warn('Post found, but missing ACF blog data:', freshData);
+            error.value = new Error('Post data is incomplete.');
+            if (!post.value) loading.value = false;
+        } else {
+            console.warn('Post not found:', response.data);
+            error.value = new Error('Post not found.');
+            if (!post.value) loading.value = false;
+        }
 
-            // Handle GraphQL errors specifically if they exist
-            if (response.data.errors) {
-                console.error('GraphQL errors fetching post:', response.data.errors);
-                // Potentially override previous error if needed
-                if (!error.value) {
-                    error.value = new Error(
-                        response.data.errors.map((e: any) => e.message).join(', '),
-                    );
-                }
-            }
-        } catch (err: any) {
-            console.error(`Error fetching blog post ${currentSlug}:`, err);
+        if (response.data.errors) {
+            console.error('GraphQL errors:', response.data.errors);
             if (!error.value) {
-                // Don't overwrite more specific errors from above
-                error.value = err;
-            }
-            // Keep potentially stale post.value if loaded from cache
-        } finally {
-            // Only set loading to false if it was the initial load (no cache)
-            if (initialLoad) {
-                loading.value = false;
+                error.value = new Error(response.data.errors.map((e: any) => e.message).join(', '));
             }
         }
-    };
-
-    // Trigger the fetch in the background
-    fetchAndCachePost();
+    } catch (err: any) {
+        console.error(`Error fetching blog post ${currentSlug}:`, err);
+        error.value = err;
+    } finally {
+        loading.value = false;
+    }
 };
 
-// Fetch post when component mounts
+// Update meta tags - separated for better organization and explicit calling
+const updateMetaTags = () => {
+    if (!post.value) {
+        // Default metadata for when no post is loaded
+        useHead({
+            title: 'Blog Post - Alpha Talent Management',
+            meta: [
+                {
+                    name: 'description',
+                    content: 'Read articles and news from Alpha Talent Management.',
+                },
+                // Reset OG and Twitter tags to defaults
+                { property: 'og:title', content: 'Alpha Talent Management Blog' },
+                {
+                    property: 'og:description',
+                    content: 'Read articles and news from Alpha Talent Management.',
+                },
+                { property: 'og:type', content: 'website' },
+                { property: 'og:url', content: currentUrl.value },
+                { property: 'og:image', content: `${baseUrl.value}/images/AATM_logo.png` },
+                { name: 'twitter:card', content: 'summary' },
+                { name: 'twitter:title', content: 'Alpha Talent Management Blog' },
+                {
+                    name: 'twitter:description',
+                    content: 'Read articles and news from Alpha Talent Management.',
+                },
+                { name: 'twitter:image', content: `${baseUrl.value}/images/AATM_logo.png` },
+            ],
+            link: [{ rel: 'canonical', href: currentUrl.value }],
+        });
+        console.log('Set default meta tags');
+        return;
+    }
+
+    const blogContent = post.value.blog?.blogContent;
+    if (!blogContent) {
+        console.warn('Post loaded but blogContent missing');
+        return;
+    }
+
+    // Create page title
+    const title = `${blogContent.title || post.value.title} - Alpha Talent Management Blog`;
+
+    // Create description from teaser or content
+    const description = blogContent.teaser
+        ? blogContent.teaser.substring(0, 160) + (blogContent.teaser.length > 160 ? '...' : '')
+        : blogContent.content
+          ? blogContent.content.replace(/<[^>]*>?/gm, '').substring(0, 160) + '...'
+          : `Read the article "${blogContent.title || post.value.title}" on the Alpha Talent Management blog.`;
+
+    // Get image URL, use fallback if needed
+    const imageUrl =
+        blogContent.thumbnail?.node?.sourceUrl || `${baseUrl.value}/images/AATM_logo.png`;
+
+    // Set meta tags with explicit console logging
+    console.log('Updating meta tags for:', title);
+    useHead({
+        title: title,
+        meta: [
+            { name: 'description', content: description },
+            // Open Graph
+            { property: 'og:title', content: title },
+            { property: 'og:description', content: description },
+            { property: 'og:type', content: 'article' },
+            { property: 'og:url', content: currentUrl.value },
+            { property: 'og:image', content: imageUrl },
+            { property: 'article:published_time', content: blogContent.publishedDate || '' },
+            { property: 'article:author', content: blogContent.author || '' },
+            // Twitter Card
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: title },
+            { name: 'twitter:description', content: description },
+            { name: 'twitter:image', content: imageUrl },
+        ],
+        link: [{ rel: 'canonical', href: currentUrl.value }],
+    });
+    console.log('Meta tags updated successfully');
+};
+
+// Lifecycle hooks
 onMounted(() => {
     fetchPost(slug.value);
 });
 
-// Watch for route changes (if navigating between posts)
+// Watch for route changes
 watch(slug, (newSlug) => {
     fetchPost(newSlug);
 });
-
-// Watch for changes in post data to update meta tags
-watch(
-    post,
-    (newPost) => {
-        if (newPost?.blog?.blogContent) {
-            const blogContent = newPost.blog.blogContent;
-            const title = `${blogContent.title || newPost.title} - Alpha Talent Management Blog`;
-            // Use teaser, fallback to truncated content, fallback to generic
-            const description = blogContent.teaser
-                ? blogContent.teaser.substring(0, 160) +
-                  (blogContent.teaser.length > 160 ? '...' : '')
-                : blogContent.content
-                  ? blogContent.content.replace(/<[^>]*>?/gm, '').substring(0, 160) + '...'
-                  : `Read the article "${blogContent.title || newPost.title}" on the Alpha Talent Management blog.`;
-            const imageUrl = blogContent.thumbnail?.node?.sourceUrl || '/images/AATM_logo.png'; // Fallback image
-
-            useHead({
-                title: title,
-                meta: [
-                    { name: 'description', content: description },
-                    // Open Graph
-                    { property: 'og:title', content: title },
-                    { property: 'og:description', content: description },
-                    { property: 'og:type', content: 'article' }, // Use 'article' for blog posts
-                    { property: 'article:published_time', content: blogContent.publishedDate }, // Add published time
-                    { property: 'article:author', content: blogContent.author }, // Add author
-                    { property: 'og:image', content: imageUrl },
-                    { property: 'og:url', content: window.location.href },
-                    // Twitter Card
-                    { name: 'twitter:card', content: 'summary_large_image' },
-                    { name: 'twitter:title', content: title },
-                    { name: 'twitter:description', content: description },
-                    { name: 'twitter:image', content: imageUrl },
-                ],
-                link: [
-                    // Add canonical link for the specific blog post
-                    { rel: 'canonical', href: window.location.href },
-                ],
-            });
-        } else {
-            // Set default/loading state meta tags
-            useHead({
-                title: 'Blog Post - Alpha Talent Management',
-                meta: [
-                    {
-                        name: 'description',
-                        content: 'Read articles and news from Alpha Talent Management.',
-                    },
-                ],
-            });
-        }
-    },
-    { immediate: true, deep: true },
-); // Use immediate and deep watch
-
-// Related posts logic removed - needs dynamic implementation
 
 // Comment form
 const commentForm = ref({
@@ -354,22 +384,10 @@ const commentForm = ref({
     comment: '',
 });
 
-// Format date
-const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
-};
-
 // Submit comment
 const submitComment = () => {
-    // In a real application, this would send the comment to your backend
     console.log('Comment submitted:', commentForm.value);
-    // Reset form after submission
-    commentForm.value = {
-        name: '',
-        email: '',
-        comment: '',
-    };
+    commentForm.value = { name: '', email: '', comment: '' };
     alert('Comment submitted successfully!');
 };
 

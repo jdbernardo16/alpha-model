@@ -308,12 +308,19 @@ useHead({
                             Talent Spotlight
                         </h3>
                         <div class="mb-6">
-                            <h1 class="text-3xl md:text-5xl font-bold mt-2 mb-4">
-                                {{
-                                    featuredTalent.talentContent?.frame1?.fullName ||
-                                    featuredTalent.title
-                                }}
-                            </h1>
+                            <router-link
+                                :to="{ name: 'talent-view', params: { slug: featuredTalent.slug } }"
+                            >
+                                <h1
+                                    class="text-3xl md:text-5xl font-bold mt-2 mb-4 transition hover:text-primary-gold"
+                                >
+                                    Hire
+                                    {{
+                                        featuredTalent.talentContent?.frame1?.fullName ||
+                                        featuredTalent.title
+                                    }}
+                                </h1>
+                            </router-link>
                             <div
                                 v-if="featuredTalent.talentContent?.frame1?.talents?.length"
                                 class="flex flex-wrap gap-4 mb-8"
@@ -372,6 +379,12 @@ useHead({
                                 </a>
                             </div>
                         </div>
+                        <!-- <button
+                            type="submit"
+                            class="inline-flex w-fit justify-center rounded bg-primary-gold hover:bg-yellow-500 px-5 py-3 text-sm font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+                        >
+                            <span>Hire {{ featuredTalent.talentContent?.frame1?.fullName }}</span>
+                        </button> -->
                     </div>
                 </div>
                 <!-- No Featured Talent Found State -->

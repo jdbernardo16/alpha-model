@@ -36,6 +36,10 @@ const GET_PROMO_EVENTS = `
                             }
                         }
                     }
+                    sponsorshipPackages {
+                      title
+                      showThisFrame
+                    }
                     pastEvents {
                         header
                         title
@@ -230,8 +234,8 @@ watch(
             </div>
         </div>
     </section>
-    <section class="border-b">
-        <PricingTable />
+    <section v-if="cms?.sponsorshipPackages?.showThisFrame" class="border-b">
+        <PricingTable :cms="cms" />
     </section>
     <section class="bg-black w-full">
         <div class="max-w-[1440px] m-auto px-4 lg:px-20 py-10 lg:py-20">

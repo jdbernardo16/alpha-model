@@ -1,6 +1,8 @@
 <template>
     <div class="max-w-screen-xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16 mx-auto">
-        <h2 class="text-4xl font-bold text-center mb-10 text-gray-900">Sponsorship Packages</h2>
+        <h2 class="text-4xl font-bold text-center mb-10 text-gray-900">
+            {{ cms?.sponsorshipPackages.title }}
+        </h2>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch md:grid-cols-3 md:gap-8">
             <!-- Package card for each package -->
             <div
@@ -115,6 +117,12 @@
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+
+defineProps({
+    cms: {
+        type: Object,
+    },
+});
 
 // Props
 // const props = defineProps({
