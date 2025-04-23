@@ -15,6 +15,7 @@ import 'swiper/css/pagination';
 // import required modules
 import { Navigation, Pagination } from 'swiper/modules';
 import { register } from 'swiper/element/bundle';
+import TalentForm from '@/components/general/TalentForm.vue';
 
 register();
 
@@ -245,7 +246,7 @@ watch(
         <!-- Portfolio Section with artistic presentation -->
         <div class="mb-12 sm:mb-20">
             <!-- Swiper Component with enhanced styling -->
-            <div v-if="talent.talentContent?.frame1?.images?.nodes?.length" class="relative">
+            <!-- <div v-if="talent.talentContent?.frame1?.images?.nodes?.length" class="relative">
                 <swiper-container
                     :slides-per-view="1"
                     :breakpoints="{
@@ -399,7 +400,6 @@ watch(
                                         :alt="social.icon?.node?.altText || 'Social Media Icon'"
                                         class="h-5 w-5 hover:scale-110 transition"
                                     />
-                                    <!-- Fallback icon or text if no image -->
                                     <span v-else class="h-5 w-5 inline-block border rounded"
                                         >?</span
                                     >
@@ -407,6 +407,191 @@ watch(
                             </div>
                         </div>
                     </swiper-slide>
+                    <swiper-slide
+                        v-for="(image, index) in talent.talentContent.frame1.images.nodes"
+                        :key="index"
+                    >
+                        <div
+                            class="aspect-w-[3] aspect-h-[4] w-full group relative overflow-hidden"
+                        >
+                            <img
+                                :src="image.sourceUrl"
+                                :alt="
+                                    image.altText ||
+                                    talent.talentContent.frame1.fullName +
+                                        ' portfolio image ' +
+                                        (index + 1)
+                                "
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
+                            <div
+                                class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-500"
+                            ></div>
+                        </div>
+                    </swiper-slide>
+                </swiper-container>
+            </div> -->
+
+            <div
+                v-if="talent.talentContent?.frame1?.images?.nodes?.length"
+                class="relative flex lg:space-y-0 space-y-6 lg:space-x-10 lg:flex-row flex-col"
+            >
+                <div class="w-full lg:w-1/2">
+                    <div
+                        v-if="talent.talentContent?.frame1"
+                        class="w-full flex flex-col justify-start relative"
+                    >
+                        <h1
+                            class="text-3xl sm:text-5xl font-extralight uppercase mb-6 sm:mb-10 tracking-wider relative"
+                        >
+                            {{ talent.talentContent.frame1.fullName }}
+                            <div
+                                v-if="talent.talentContent.frame1.talents?.length"
+                                class="space-x-2 flex mt-2"
+                            >
+                                <p
+                                    v-for="(t, index) in talent.talentContent.frame1.talents"
+                                    :key="index"
+                                    class="px-2.5 bg-primary-gold w-fit text-white rounded-full text-sm"
+                                >
+                                    {{ t.label }}
+                                </p>
+                            </div>
+                            <div
+                                class="w-12 sm:w-16 h-0.5 bg-black absolute -bottom-2 sm:-bottom-4 left-0"
+                            ></div>
+                        </h1>
+
+                        <div
+                            class="grid grid-cols-5 gap-x-4 sm:gap-x-12 gap-y-4 text-sm tracking-wide my-6"
+                        >
+                            <template v-if="talent.talentContent.frame1.attributes?.height">
+                                <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                    HEIGHT
+                                </div>
+                                <div class="col-span-4 border-b border-gray-100 pb-2">
+                                    {{ talent.talentContent.frame1.attributes.height }}
+                                </div>
+                            </template>
+
+                            <template v-if="talent.talentContent.frame1.attributes?.bust">
+                                <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                    BUST
+                                </div>
+                                <div class="col-span-4 border-b border-gray-100 pb-2">
+                                    {{ talent.talentContent.frame1.attributes.bust }}
+                                </div>
+                            </template>
+
+                            <template v-if="talent.talentContent.frame1.attributes?.waist">
+                                <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                    WAIST
+                                </div>
+                                <div class="col-span-4 border-b border-gray-100 pb-2">
+                                    {{ talent.talentContent.frame1.attributes.waist }}
+                                </div>
+                            </template>
+
+                            <template v-if="talent.talentContent.frame1.attributes?.hip">
+                                <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                    HIP
+                                </div>
+                                <div class="col-span-4 border-b border-gray-100 pb-2">
+                                    {{ talent.talentContent.frame1.attributes.hip }}
+                                </div>
+                            </template>
+
+                            <template v-if="talent.talentContent.frame1.attributes?.shoes">
+                                <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                    SHOE
+                                </div>
+                                <div class="col-span-4 border-b border-gray-100 pb-2">
+                                    {{ talent.talentContent.frame1.attributes.shoes }}
+                                </div>
+                            </template>
+
+                            <template v-if="talent.talentContent.frame1.attributes?.dress">
+                                <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                    DRESS
+                                </div>
+                                <div class="col-span-4 border-b border-gray-100 pb-2">
+                                    {{ talent.talentContent.frame1.attributes.dress }}
+                                </div>
+                            </template>
+
+                            <template v-if="talent.talentContent.frame1.attributes?.cup">
+                                <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                    CUP
+                                </div>
+                                <div class="col-span-4 border-b border-gray-100 pb-2">
+                                    {{ talent.talentContent.frame1.attributes.cup }}
+                                </div>
+                            </template>
+
+                            <template v-if="talent.talentContent.frame1.attributes?.hair">
+                                <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                    HAIR
+                                </div>
+                                <div class="col-span-4 border-b border-gray-100 pb-2">
+                                    {{ talent.talentContent.frame1.attributes.hair }}
+                                </div>
+                            </template>
+
+                            <template v-if="talent.talentContent.frame1.attributes?.eyes">
+                                <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                    EYES
+                                </div>
+                                <div class="col-span-4 border-b border-gray-100 pb-2">
+                                    {{ talent.talentContent.frame1.attributes.eyes }}
+                                </div>
+                            </template>
+
+                            <template v-if="talent.talentContent.frame1.attributes?.weight">
+                                <div class="uppercase col-span-1 text-gray-500 font-medium">
+                                    WEIGHT
+                                </div>
+                                <div class="col-span-4 border-b border-gray-100 pb-2">
+                                    {{ talent.talentContent.frame1.attributes.weight }}
+                                </div>
+                            </template>
+                        </div>
+                        <p class="mb-4 uppercase">
+                            Follow
+                            {{
+                                talent.talentContent?.frame1?.fullName
+                                    ? talent.talentContent.frame1.fullName.split(' ')[0]
+                                    : 'them'
+                            }}
+                            on social media:
+                        </p>
+                        <div class="flex items-center gap-6">
+                            <a
+                                v-for="(social, index) in talent.talentContent?.contactDetails
+                                    ?.socialMedia"
+                                :key="index"
+                                :href="social.link || '#'"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-amber-400 hover:text-amber-300 transition-colors"
+                            >
+                                <img
+                                    v-if="social.icon?.node?.sourceUrl"
+                                    :src="social.icon?.node?.sourceUrl"
+                                    :alt="social.icon?.node?.altText || 'Social Media Icon'"
+                                    class="h-5 w-5 hover:scale-110 transition"
+                                />
+                                <!-- Fallback icon or text if no image -->
+                                <span v-else class="h-5 w-5 inline-block border rounded">?</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <swiper-container
+                    :slides-per-view="1"
+                    :navigation="talent.talentContent.frame1.images.nodes.length > 1"
+                    :pagination="{ clickable: true }"
+                    class="portfolio-slider w-full lg:w-1/2"
+                >
                     <swiper-slide
                         v-for="(image, index) in talent.talentContent.frame1.images.nodes"
                         :key="index"
@@ -477,6 +662,9 @@ watch(
                 <h2 class="text-xl sm:text-2xl font-extralight uppercase tracking-widest">
                     Hire {{ talent.talentContent.frame1.fullName.split(' ')[0] }}
                 </h2>
+            </div>
+            <div>
+                <talent-form :name="talent.talentContent.frame1.fullName" />
             </div>
             <div class="wysiwyg" v-html="talent.talentContent?.frame3?.description"></div>
         </div>

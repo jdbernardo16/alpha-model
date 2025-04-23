@@ -304,38 +304,52 @@ useHead({
 
                     <!-- Content section -->
                     <div class="md:w-9/12 md:p-8 p-4 flex flex-col justify-center">
-                        <h3 class="uppercase tracking-widest font-bold text-lg md:text-xl">
-                            Talent Spotlight
-                        </h3>
-                        <div class="mb-6">
+                        <div
+                            class="flex justify-between lg:flex-row flex-col lg:space-x-4 lg:space-y-0 space-y-6 mb-8"
+                        >
+                            <div>
+                                <h3 class="uppercase tracking-widest font-bold text-lg md:text-xl">
+                                    Talent Spotlight
+                                </h3>
+                                <div>
+                                    <h1 class="text-3xl md:text-5xl font-bold mb-4">
+                                        {{
+                                            featuredTalent.talentContent?.frame1?.fullName ||
+                                            featuredTalent.title
+                                        }}
+                                    </h1>
+                                    <div
+                                        v-if="featuredTalent.talentContent?.frame1?.talents?.length"
+                                        class="flex flex-wrap gap-4"
+                                    >
+                                        <span
+                                            v-for="(tag, index) in featuredTalent.talentContent
+                                                .frame1.talents"
+                                            :key="index"
+                                            class="px-3 py-1 bg-black text-white text-xs rounded-full"
+                                        >
+                                            {{ tag.label }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                             <router-link
                                 :to="{ name: 'talent-view', params: { slug: featuredTalent.slug } }"
                             >
-                                <h1
-                                    class="text-3xl md:text-5xl font-bold mt-2 mb-4 transition hover:text-primary-gold"
+                                <Button
+                                    class="uppercase font-bold bg-black px-5 py-3 flex items-center space-x-5 hover:bg-primary-gold transition rounded-lg text-white"
                                 >
-                                    Hire
-                                    {{
-                                        featuredTalent.talentContent?.frame1?.fullName ||
-                                        featuredTalent.title
-                                    }}
-                                </h1>
+                                    <p>
+                                        Hire
+                                        {{
+                                            featuredTalent.talentContent?.frame1?.fullName ||
+                                            featuredTalent.title
+                                        }}
+                                    </p>
+                                </Button>
                             </router-link>
-                            <div
-                                v-if="featuredTalent.talentContent?.frame1?.talents?.length"
-                                class="flex flex-wrap gap-4 mb-8"
-                            >
-                                <span
-                                    v-for="(tag, index) in featuredTalent.talentContent.frame1
-                                        .talents"
-                                    :key="index"
-                                    class="px-3 py-1 bg-black text-white text-xs rounded-full"
-                                >
-                                    {{ tag.label }}
-                                </span>
-                            </div>
-                            <div class="w-16 h-0.5 bg-black"></div>
                         </div>
+                        <div class="w-16 h-0.5 bg-black mb-6"></div>
 
                         <div
                             v-if="featuredTalent.talentContent?.frame2?.description"
