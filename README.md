@@ -1,6 +1,6 @@
 # Alpha Model - Vue 3 Project
 
-This is a Vue 3 project built with Vite, designed to showcase a modern and responsive user interface for a talent and modeling agency. The project includes a dynamic header, a hero section, a featured models slider, and sections for showcasing values and promo events.
+This is a Vue 3 project built with Vite, designed to showcase a modern and responsive user interface for a talent and modeling management. The project includes a dynamic header, a hero section, a featured models slider, and sections for showcasing values and promo events.
 
 ## Features
 
@@ -8,7 +8,7 @@ This is a Vue 3 project built with Vite, designed to showcase a modern and respo
 - **Dynamic Components**: Reusable components like `FeaturedModelSlider` and `Button` are used to maintain consistency.
 - **Hero Section**: A visually appealing hero section with a background image and call-to-action buttons.
 - **Featured Models Slider**: A slider to showcase featured models with their details.
-- **Values Section**: Highlights the key values of the agency.
+- **Values Section**: Highlights the key values of the management.
 - **Promo Events Section**: Displays promotional events with images and descriptions.
 
 ## Technologies Used

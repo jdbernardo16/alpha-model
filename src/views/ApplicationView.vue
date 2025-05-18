@@ -157,14 +157,14 @@ useHead({
         {
             name: 'description',
             content:
-                'Apply to join Alpha Talent Management. Submit your application to become a model, actor, or influencer with our agency.',
+                'Apply to join Alpha Talent Management. Submit your application to become a model, actor, or influencer with our management.',
         },
         // Open Graph
         { property: 'og:title', content: 'Become a Talent - Apply to Alpha Talent Management' },
         {
             property: 'og:description',
             content:
-                'Apply to join Alpha Talent Management. Submit your application to become a model, actor, or influencer with our agency.',
+                'Apply to join Alpha Talent Management. Submit your application to become a model, actor, or influencer with our management.',
         },
         { property: 'og:type', content: 'website' },
         { property: 'og:image', content: '/images/AATM_logo.png' }, // Use a relevant general image or logo
@@ -175,7 +175,7 @@ useHead({
         {
             name: 'twitter:description',
             content:
-                'Apply to join Alpha Talent Management. Submit your application to become a model, actor, or influencer with our agency.',
+                'Apply to join Alpha Talent Management. Submit your application to become a model, actor, or influencer with our management.',
         },
         { name: 'twitter:image', content: '/images/AATM_logo.png' },
     ],

@@ -120,7 +120,7 @@ onMounted(() => {
 watch(
     cms,
     (newCms) => {
-        const title = 'Alpha Talent Management - Premier Talent Agency';
+        const title = 'Alpha Talent Management - Premier Talent Management';
         const description = newCms?.frame2?.description
             ? newCms.frame2.description.replace(/<[^>]*>?/gm, '').substring(0, 160) + '...'
             : 'Discover top models, actors, and influencers at Alpha Talent Management. Your premier source for professional talent.';

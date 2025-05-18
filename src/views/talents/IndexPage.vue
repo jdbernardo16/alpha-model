@@ -312,12 +312,19 @@ useHead({
                                     Talent Spotlight
                                 </h3>
                                 <div>
-                                    <h1 class="text-3xl md:text-5xl font-bold mb-4">
-                                        {{
-                                            featuredTalent.talentContent?.frame1?.fullName ||
-                                            featuredTalent.title
-                                        }}
-                                    </h1>
+                                    <div
+                                        class="flex lg:items-center mb-4 lg:space-x-2 lg:flex-row flex-col"
+                                    >
+                                        <h1 class="text-3xl lg:text-5xl font-bold">
+                                            {{
+                                                featuredTalent.talentContent?.frame1?.fullName ||
+                                                featuredTalent.title
+                                            }}
+                                        </h1>
+                                        <p class="lg:text-5xl text-xl font-light">
+                                            ({{ featuredTalent.talentContent?.frame1?.address }})
+                                        </p>
+                                    </div>
                                     <div
                                         v-if="featuredTalent.talentContent?.frame1?.talents?.length"
                                         class="flex flex-wrap gap-4"
@@ -464,8 +471,18 @@ useHead({
                                 </div>
                             </div>
                         </div>
-                        <div class="text-center mt-3 uppercase text-sm">
-                            <h3 class="tracking-wider">{{ talent.title }}</h3>
+                        <div
+                            class="text-center mt-3 uppercase text-sm flex md:flex-col flex-row items-center space-x-1 m-auto md:w-full w-fit"
+                        >
+                            <h3 class="tracking-wider md:font-normal font-bold">
+                                {{ talent.title }}
+                            </h3>
+                            <p
+                                v-if="talent.talentContent?.frame1?.address"
+                                class="text-sm md:hidden block text-primary-gold"
+                            >
+                                ({{ talent.talentContent?.frame1?.address }})
+                            </p>
                         </div>
                     </router-link>
                 </div>
